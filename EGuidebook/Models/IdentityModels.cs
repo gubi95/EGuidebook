@@ -20,6 +20,8 @@ namespace EGuidebook.Models
 
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public virtual DbSet<SpotModel> Spots { get; set; } 
+
         public ApplicationDbContext()
             : base("defConnString", throwIfV1Schema: false)
         {
