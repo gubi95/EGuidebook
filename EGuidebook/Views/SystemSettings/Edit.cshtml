@@ -1,0 +1,52 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model SystemSettingsViewModel
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Ustawienia systemowe";
+    ViewBag.IconClass = "fa fa-cogs";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.SETTINGS;
+}
+
+@using (Html.BeginForm("Edit", "SystemSettings", FormMethod.Post))
+{
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.SMTP_Email)
+            @Html.TextBoxFor(x => x.SMTP_Email, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.SMTP_Email, "", new { @class = "error-msg" })
+        </div>    
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.SMTP_Password)
+            @Html.TextBoxFor(x => x.SMTP_Password, new { @class = "form-control" })        
+            @Html.ValidationMessageFor(x => x.SMTP_Password, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.SMTP_Host)
+            @Html.TextBoxFor(x => x.SMTP_Host, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.SMTP_Host, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.SMTP_Port)
+            @Html.TextBoxFor(x => x.SMTP_Port, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.SMTP_Port, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.SMTP_EnableSSL)
+            @Html.CheckBoxFor(x => x.SMTP_EnableSSL)
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-warning btn-md pull-right" style="min-width: 90px;"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
+        </div>
+    </div>
+}

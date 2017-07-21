@@ -16,9 +16,9 @@ namespace EGuidebook.Models
         [Required]        
         public string Description { get; set; }
         [Required]
-        public float CoorX { get; set; }
+        public string CoorX { get; set; }
         [Required]
-        public float CoorY { get; set; }
+        public string CoorY { get; set; }
         [Required]
         public bool IsApproved { get; set; }
         [Required]

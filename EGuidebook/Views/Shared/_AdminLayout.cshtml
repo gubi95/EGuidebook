@@ -1,0 +1,181 @@
+﻿@using EGuidebook.Shared
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+</head>
+<body>
+    <style>
+        html {
+            margin: 0;
+            padding: 0;
+            background: url(/Content/assets/img/background.jpg) no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        body {
+            background-color: rgba(0,0,0,0) !important;            
+        }
+
+        .error-msg {
+            color: #FF484E;
+            margin-top: 5px;
+            line-height: 25px;
+        }
+
+        #side-menu {
+            list-style: none;
+            width: 100%;
+            padding: 0;
+        }
+
+        #side-menu li {
+            font-size: 18px;      
+            border-top: 1px solid #555;                        
+        }
+
+        #side-menu li:last-child {
+            border-bottom: 1px solid #555;
+        }
+
+        #side-menu li .fa {
+            font-size: 16px;
+            margin-right: 20px;
+        }
+
+        #side-menu li a, #side-menu li a:visited, #side-menu li a:active {
+            width: 100%;
+            display: inline-block;
+            padding-left: 30px;
+            text-decoration: none;
+            cursor: pointer;
+            color: #DDD;
+            font-family: 'Lato';
+            padding-bottom: 10px;
+            padding-top: 6px;
+            -webkit-transition: all 0.1s;
+            transition: all 0.1s;
+        }
+
+        #side-menu a:hover {
+            background-color: #111;
+            color: #FFF;
+        }
+
+        #side-menu a.selected {
+            background-image: url(/Content/assets/img/blue-menu-triangle.png);
+            background-repeat: no-repeat;
+            background-size: auto 100%;
+            background-position: right -8px top 0;
+            background-color: #444;
+        }
+    </style>
+    
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/moment")
+    @Scripts.Render("~/bundles/iCheck")
+    @Scripts.Render("~/bundles/scripts")
+    @Styles.Render("~/Content/css")
+    @RenderSection("scripts", false)
+
+    <div style="width: 100%; height: 100%; position: relative; background-color: #FFF; overflow: hidden;">
+        <div style="position: absolute; top: 0; left: 0; height: 40px; width: 100%; background-color: #212121; text-align: center;">
+            <i class="fa fa-bars" style="color: #FFF; position: absolute; top: 0; left: 4px; font-size: 38px; cursor: pointer;"></i>
+
+            <span style="font-size: 20px; color: #FFF; font-family: 'Lato'; line-height: 34px;">
+                <i class="fa fa-calendar"></i>&nbsp;<span id="span-date-and-time"></span>
+            </span>
+
+        </div>
+
+        <div style="margin-top: 40px; float: left; min-height: 600px; width: 240px; background-color: #212121; padding: 10px; padding-top: 0;">
+
+            <div style="height: 100%;">
+                <div class="row" style="margin-top: 30px; padding-bottom: 15px;">
+                    <div class="col-md-12">
+                        <div style="padding: 10px; border: 1px solid #CCC; border-radius: 5px; width: auto; height: auto; text-align: center; margin: 0 auto; max-width: 147px;">
+                            <img src="~/Content/assets/img/ja.jpg" style="width: 125px; height: 125px; border-radius: 5px;" />
+                        </div>                        
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12" style="color: #FFF; font-size: 20px; font-family: 'Lato'; text-align: center;">
+                        Rafał<br />Gubała<br />---<br/><b>Administrator</b>
+                    </div>
+                </div>                
+                <div class="row">
+                    <div class="col-md-12" style="padding-top: 50px; padding-left: 0; padding-right: 5px;">
+                        <ul id="side-menu">
+                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.DASHBOARD ? "selected" : "")" href="/Home"><i class="fa fa-dashboard"></i>Panel</a></li>
+                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.USERS ? "selected" : "")"><i class="fa fa-users"></i>Użytkownicy</a></li>
+                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SPOTS ? "selected" : "")"><i class="fa fa-university"></i>Miejsca</a></li>
+                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.CATEGORIES ? "selected" : "")"><i class="fa fa-glass"></i>Kategorie</a></li>
+                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SETTINGS ? "selected" : "")" href="/SystemSettings/Edit"><i class="fa fa-cogs"></i>Ustawienia</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row" style="padding-top: 40px; padding-bottom: 20px;">
+                    <div class="col-md-12" style="text-align: center; color: #FFF; font-family: 'Lato'; font-size: 16px;">
+                        <span>Do końca sesji pozostało:</span><br/>
+                        <b><span id="session-time-left"></span></b>
+                    </div>
+                </div>
+                <div class="row" style="padding-bottom: 30px;">
+                    <div class="col-md-12" style="text-align: center; padding-top: 10px;">
+                        @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
+                        {
+                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-power-off"></i>&nbsp;Wyloguj</button>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="width: calc(100% - 240px); float: right; height: 300px; margin-top: 40px; padding: 30px;">
+            <div class="row">
+                <div class="col-md-12">
+                    <h2 style="margin-top: 0;">@(!string.IsNullOrEmpty(ViewBag.IconClass) ? Html.Raw("<i class=\"" + ViewBag.IconClass + "\"></i>&nbsp;") : "")@ViewBag.Title</h2>
+                    <hr style="border-color: #CCC;" />
+                </div>
+            </div>
+            @RenderBody()
+        </div>
+    </div>
+
+    <script>
+        var sessionTimeSecondsLeft = 3600;
+        jQuery(document).ready(function () {            
+            setDateAndTime();
+            setSessionTime();
+            setInterval(setDateAndTime, 1000);
+            setInterval(setSessionTime, 1000);
+            setCheckBoxes();
+        });
+        function setDateAndTime() {
+            jQuery('#span-date-and-time').html(moment().format('DD-MM-YYYY HH:mm:ss'))
+        }
+
+        function setSessionTime() {
+            sessionTimeSecondsLeft--;
+            var minutes = Math.floor(sessionTimeSecondsLeft / 60);
+            minutes = minutes <= 9 ? '0' + minutes : minutes;
+            var seconds = sessionTimeSecondsLeft - (minutes * 60);
+            seconds = seconds <= 9 ? '0' + seconds : seconds;
+            var timeLeftFormatted = minutes + ' min ' + seconds + ' s';
+            jQuery('#session-time-left').html(timeLeftFormatted);
+        }
+        function setCheckBoxes() {
+            jQuery('input[type="checkbox"]').iCheck({
+                checkboxClass: 'icheckbox_flat-blue'
+            });
+        }
+    </script>
+</body>
+</html>

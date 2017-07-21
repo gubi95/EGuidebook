@@ -1,109 +1,79 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Security;
 
 namespace EGuidebook.Models
 {
-    public class ExternalLoginConfirmationViewModel
-    {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-    }
-
-    public class ExternalLoginListViewModel
-    {
-        public string ReturnUrl { get; set; }
-    }
-
-    public class SendCodeViewModel
-    {
-        public string SelectedProvider { get; set; }
-        public ICollection<System.Web.Mvc.SelectListItem> Providers { get; set; }
-        public string ReturnUrl { get; set; }
-        public bool RememberMe { get; set; }
-    }
-
-    public class VerifyCodeViewModel
-    {
-        [Required]
-        public string Provider { get; set; }
-
-        [Required]
-        [Display(Name = "Code")]
-        public string Code { get; set; }
-        public string ReturnUrl { get; set; }
-
-        [Display(Name = "Remember this browser?")]
-        public bool RememberBrowser { get; set; }
-
-        public bool RememberMe { get; set; }
-    }
-
-    public class ForgotViewModel
-    {
-        [Required]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-    }
-
     public class LoginViewModel
     {
-        [Required]
         [Display(Name = "E-mail")]
-        [EmailAddress]
-        public string Email { get; set; }
-
-        [Required]
+        [Required(ErrorMessage = "Prosze podać adres e-mail")]
+        [EmailAddress(ErrorMessage = "Podany adres e-mail jest nieprawidłowy")]
+        public string LoginEmail { get; set; }
+                
         [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Prosze podać hasło")]
+        [StringLength(100, ErrorMessage = "{0} musi zawierać conajmniej {2} znaków", MinimumLength = 6)]
         [Display(Name = "Hasło")]
-        public string Password { get; set; }
+        public string LoginPassword { get; set; }
+
+        [Display(Name = "E-mail")]
+        [Required(ErrorMessage = "Prosze podać adres e-mail")]
+        [EmailAddress(ErrorMessage = "Podany adres e-mail jest nieprawidłowy")]        
+        public string RegisterEmail { get; set; }
+
+        [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Prosze podać hasło")]
+        [StringLength(100, ErrorMessage = "{0} musi zawierać conajmniej {2} znaków", MinimumLength = 6)]
+        [Display(Name = "Hasło")]
+        [MembershipPassword(
+            MinRequiredNonAlphanumericCharacters = 1,
+            MinNonAlphanumericCharactersError = "Hasło musi zawierać conajmniej 1 z symboli: !, @, # itp.",
+            ErrorMessage = "Hasło musi zawierać conajmniej 6 znaków i 1 z symboli: !, @, # itp."
+        )]
+        public string RegisterPassword { get; set; }
+
+        [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Prosze podać hasło")]
+        [Compare("RegisterPassword", ErrorMessage = "Hasła nie są identyczne")]
+        [StringLength(100, ErrorMessage = "{0} musi zawierać conajmniej {2} znaków", MinimumLength = 6)]
+        [Display(Name = "Powtórz hasło")]
+        public string RegisterPasswordRepeat { get; set; }
+
+        [Display(Name = "E-mail")]
+        [Required(ErrorMessage = "Prosze podać adres e-mail")]
+        [EmailAddress(ErrorMessage = "Podany adres e-mail jest nieprawidłowy")]
+        public string PasswordResetEmail { get; set; }
     }
 
-    public class RegisterViewModel
+    public class ChangePasswordViewModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [Display(Name = "E-mail")]
+        [Required(ErrorMessage = "Prosze podać adres e-mail")]
+        [EmailAddress(ErrorMessage = "Podany adres e-mail jest nieprawidłowy")]
+        public string Username { get; set; }
+        
+        [Display(Name = "Tymczasowe hasło")]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
-
-        [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
-    }
-
-    public class ResetPasswordViewModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
-
-        [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
-        [DataType(DataType.Password)]
-        [Display(Name = "Password")]
-        public string Password { get; set; }
+        [Required(ErrorMessage = "Proszę podać tymczasowe hasło")]
+        public string TempPassword { get; set; }
 
         [DataType(DataType.Password)]
-        [Display(Name = "Confirm password")]
-        [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        public string ConfirmPassword { get; set; }
+        [Required(ErrorMessage = "Prosze podać hasło")]
+        [StringLength(100, ErrorMessage = "{0} musi zawierać conajmniej {2} znaków", MinimumLength = 6)]
+        [Display(Name = "Hasło")]
+        [MembershipPassword(
+            MinRequiredNonAlphanumericCharacters = 1,
+            MinNonAlphanumericCharactersError = "Hasło musi zawierać conajmniej 1 z symboli: !, @, # itp.",
+            ErrorMessage = "Hasło musi zawierać conajmniej 6 znaków i 1 z symboli: !, @, # itp."
+        )]
+        public string NewPassword { get; set; }
 
-        public string Code { get; set; }
-    }
-
-    public class ForgotPasswordViewModel
-    {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Prosze podać hasło")]
+        [Compare("NewPassword", ErrorMessage = "Hasła nie są identyczne")]
+        [StringLength(100, ErrorMessage = "{0} musi zawierać conajmniej {2} znaków", MinimumLength = 6)]
+        [Display(Name = "Powtórz hasło")]
+        public string NewPasswordRepeat { get; set; }
     }
 }

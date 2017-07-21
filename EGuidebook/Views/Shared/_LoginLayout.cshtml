@@ -6,12 +6,93 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet"> 
 </head>
 <body>
+    <style>
+        html {
+            margin: 0;
+            padding: 0;
+            background: url(/Content/assets/img/background.jpg) no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        body {
+            background-color: rgba(0,0,0,0) !important;
+        }
+
+        .row {
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        .login-wrapper {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding-bottom: 20px;
+            margin-top: 250px;
+        }
+
+        .white-anchor, .white-anchor:visited, .white-anchor:active {
+            color: #CCC;
+            text-decoration: none;
+            cursor: pointer;
+            font-family: 'Lato';
+        }
+
+        label {
+            font-family: 'Lato';
+        }
+
+        .white-anchor:hover {
+            color: #999;
+            text-decoration: none;
+        }
+
+        .login-sub-wrapper {
+            border: 1px solid #999;
+            border-radius: 4px;
+            padding-bottom: 10px;
+            min-height: 246px !important;
+            max-width: 550px;
+        }
+
+        .login-header {
+            margin: 0;
+            font-family: Lato;
+            color: #CCC;
+        }
+
+        .error-msg {
+            color: #FF484E;
+            margin-top: 5px;
+            line-height: 25px;
+        }
+
+        @@media screen and (max-width: 992px) {
+            .login-sub-wrapper {
+                max-width: 999999px !important;
+                float: unset !important;
+                margin-bottom: 20px;
+            }
+
+            .login-wrapper {
+                margin-top: 20px !important;
+            }
+
+            body {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
+        }
+    </style>
+
     @RenderBody()
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/jqueryval")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/scripts")
     @Styles.Render("~/Content/css")
+    @RenderSection("scripts", false)
 </body>
 </html>

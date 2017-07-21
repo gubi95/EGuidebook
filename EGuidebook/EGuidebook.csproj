@@ -199,7 +199,8 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\ManageController.cs" />
+    <Compile Include="Controllers\SpotController.cs" />
+    <Compile Include="Controllers\SystemSettingsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -211,12 +212,33 @@
     <Compile Include="Migrations\201706132127511_SpotModel.Designer.cs">
       <DependentUpon>201706132127511_SpotModel.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201707051850231_SystemSettingsModelSMTP.cs" />
+    <Compile Include="Migrations\201707051850231_SystemSettingsModelSMTP.Designer.cs">
+      <DependentUpon>201707051850231_SystemSettingsModelSMTP.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707052002174_UserModelIsPasswordChangeEnforced.cs" />
+    <Compile Include="Migrations\201707052002174_UserModelIsPasswordChangeEnforced.Designer.cs">
+      <DependentUpon>201707052002174_UserModelIsPasswordChangeEnforced.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707161242143_SpotModel_CoorDouble.cs" />
+    <Compile Include="Migrations\201707161242143_SpotModel_CoorDouble.Designer.cs">
+      <DependentUpon>201707161242143_SpotModel_CoorDouble.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201707161254003_SpotModel_CoorString.cs" />
+    <Compile Include="Migrations\201707161254003_SpotModel_CoorString.Designer.cs">
+      <DependentUpon>201707161254003_SpotModel_CoorString.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\AlertBoxViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\SpotModel.cs" />
+    <Compile Include="Models\SpotViewModel.cs" />
+    <Compile Include="Models\SystemSettingsModel.cs" />
+    <Compile Include="Models\SystemSettingsViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shared\Helper.cs" />
+    <Compile Include="Shared\SMTPManager.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +246,18 @@
     <Content Include="Content\assets\bootstrap\css\bootstrap-theme.min.css" />
     <Content Include="Content\assets\bootstrap\css\bootstrap.css" />
     <Content Include="Content\assets\bootstrap\css\bootstrap.min.css" />
+    <Content Include="Content\assets\font-awesome-4.7.0\css\font-awesome.css" />
+    <Content Include="Content\assets\font-awesome-4.7.0\css\font-awesome.min.css" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\fontawesome-webfont.svg" />
+    <Content Include="Content\assets\font-awesome-4.7.0\HELP-US-OUT.txt" />
+    <Content Include="Content\assets\img\background.jpg" />
+    <Content Include="Content\assets\img\map-pin.png" />
+    <Content Include="Content\assets\img\no-photo.png" />
+    <Content Include="Content\assets\img\no-user-photo.png" />
+    <Content Include="Content\assets\img\x-icon.png" />
+    <Content Include="Content\assets\js\moment-with-locales.js" />
+    <Content Include="Content\assets\js\scripts.js" />
+    <Content Include="Content\Site.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -239,6 +273,39 @@
     <Content Include="Content\assets\bootstrap\css\bootstrap.css.map" />
     <Content Include="Content\assets\bootstrap\css\bootstrap-theme.min.css.map" />
     <Content Include="Content\assets\bootstrap\css\bootstrap-theme.css.map" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\fontawesome-webfont.eot" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\fontawesome-webfont.ttf" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\fontawesome-webfont.woff" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\fontawesome-webfont.woff2" />
+    <Content Include="Content\assets\font-awesome-4.7.0\fonts\FontAwesome.otf" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\animated.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\bordered-pulled.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\core.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\fixed-width.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\font-awesome.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\icons.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\larger.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\list.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\mixins.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\path.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\rotated-flipped.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\screen-reader.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\stacked.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\less\variables.less" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\font-awesome.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_animated.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_bordered-pulled.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_core.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_fixed-width.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_icons.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_larger.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_list.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_mixins.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_path.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_rotated-flipped.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_screen-reader.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_stacked.scss" />
+    <Content Include="Content\assets\font-awesome-4.7.0\scss\_variables.scss" />
     <None Include="Content\assets\jQuery\jquery-1.10.2.intellisense.js" />
     <Content Include="Content\assets\bootstrap\js\bootstrap.js" />
     <Content Include="Content\assets\bootstrap\js\bootstrap.min.js" />
@@ -263,9 +330,17 @@
     <Content Include="Views\Web.config" />
     <Content Include="Views\Shared\_LoginLayout.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
+    <Content Include="Views\Shared\_MainLayout.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Shared\AlertBox\AlertBox.cshtml" />
+    <Content Include="Views\Account\ChangePassword.cshtml" />
+    <Content Include="Views\Spot\Create.cshtml" />
+    <Content Include="Views\Shared\_AdminLayout.cshtml" />
+    <Content Include="Views\SystemSettings\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Views\SpotViewModel\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
@@ -278,6 +353,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201706132127511_SpotModel.resx">
       <DependentUpon>201706132127511_SpotModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707051850231_SystemSettingsModelSMTP.resx">
+      <DependentUpon>201707051850231_SystemSettingsModelSMTP.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707052002174_UserModelIsPasswordChangeEnforced.resx">
+      <DependentUpon>201707052002174_UserModelIsPasswordChangeEnforced.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707161242143_SpotModel_CoorDouble.resx">
+      <DependentUpon>201707161242143_SpotModel_CoorDouble.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707161254003_SpotModel_CoorString.resx">
+      <DependentUpon>201707161254003_SpotModel_CoorString.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -1,0 +1,45 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+</head>
+<body>
+    <style>
+        html {
+            margin: 0;
+            padding: 0;
+            background: url(/Content/assets/img/background.jpg) no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        body {
+            background-color: rgba(0,0,0,0) !important;
+            padding: 20px;
+        }
+
+        .error-msg {
+            color: #FF484E;
+            margin-top: 5px;
+            line-height: 25px;
+        }
+        
+    </style>
+    
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/scripts")
+    @Styles.Render("~/Content/css")
+    @RenderSection("scripts", false)
+
+    <div style="width: 1400px; height: 100%; background-color: #FFF; margin: 0 auto; border-radius: 5px; border: 1px solid #CCC; padding: 20px;">
+        @RenderBody()
+    </div>
+    
+</body>
+</html>

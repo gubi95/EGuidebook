@@ -1,0 +1,236 @@
+﻿@using EGuidebook.Models
+@using EGuidebook.Shared
+@model SpotViewModel
+@{
+    Layout = Helper.MainLayoutPath;
+}
+
+<style>
+    .row {
+        padding-bottom: 10px;
+    }
+
+    .spot-photo {
+        width: 100px;
+        height: 100px;
+        margin-right: 10px;
+        border-radius: 5px;
+        padding: 5px;
+        border: 1px solid #CCC;
+    }
+
+    #ul-spot-images li:hover .spot-photo-delete {
+        display: block;
+    }
+
+    .spot-photo-delete {
+        position: absolute;
+        left: 0;
+        top: 0;
+        padding: 24px;
+        border-radius: 5px;
+        width: 100px;
+        height: 100px;
+        display: none;
+        cursor: pointer;
+    }
+
+    #ul-spot-images {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    #ul-spot-images li {
+        float: left;
+        position: relative;
+    }
+</style>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&callback=initMap"></script>
+
+@section scripts {
+ <script>
+     var map = null;
+     var geocoder = null;
+     function initMap() {
+         var uluru = { lat: -25.363, lng: 131.044 };
+         geocoder = new google.maps.Geocoder();
+         map = new google.maps.Map(document.getElementById('map'), {
+             zoom: 16,
+             center: uluru
+         });
+         var marker = new google.maps.Marker({
+             position: uluru,
+             map: map
+         });
+     }
+
+     function findOnMap() {         
+         var address = jQuery('#txtSpotAddress').val();
+         geocoder.geocode({ 'address': address = address }, function (results, status) {
+             if (status == google.maps.GeocoderStatus.OK) {
+                 map.setCenter(results[0].geometry.location);
+                 jQuery('#CoorX').val(results[0].geometry.location.lat().toFixed(7));
+                 jQuery('#CoorY').val(results[0].geometry.location.lng().toFixed(7));
+                 var marker = new google.maps.Marker({
+                     map: map,
+                     position: results[0].geometry.location,
+                     icon: '/Content/assets/img/map-pin.png'
+                 });
+             }
+         });
+     }
+
+     var $currentImg = null;
+     function openUploader() {
+         var i = 1;
+         jQuery('.spot-photo').each(function () {
+             var isPhotoLoaded = jQuery(this).attr('data-loaded') != undefined && jQuery(this).attr('data-loaded') == 'true';
+             if (!isPhotoLoaded) {
+                 jQuery('input[type=file][id="Image' + i + '"]').click();
+                 $currentImg = jQuery(this);
+                 return false;
+             }
+             i++;
+         });
+     }
+
+     function setUploadedPhoto(e) {
+         $currentImg
+             .attr('data-loaded', 'true')
+             .attr('src', URL.createObjectURL(e.target.files[0]));
+     }
+
+     function deletePhoto() {
+
+     }
+
+     jQuery(document).ready(function () {         
+         initMap();
+
+         jQuery('.spot-image-upload').on('change', setUploadedPhoto);
+         jQuery('#btnAddPhoto').on('click', openUploader);
+         jQuery('#btnFindOnMap').on('click', findOnMap);
+         jQuery('#txtSpotAddress').keyup(function (event) {
+             if (event.keyCode == 13) {
+                 findOnMap();
+             }
+         });
+
+         jQuery(document).on('keypress', 'form', function (e) {
+             return e.keyCode != 13;
+         });
+     });
+</script>
+}
+
+@using (Html.BeginForm("Create", "Spot", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.TextBoxFor(x => x.Image1, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
+    @Html.TextBoxFor(x => x.Image2, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
+    @Html.TextBoxFor(x => x.Image3, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
+    @Html.TextBoxFor(x => x.Image4, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
+    @Html.TextBoxFor(x => x.Image5, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
+
+    <div class="row" style="padding-bottom: 20px;">
+        <div class="col-md-8">
+            <h2 style="font-family: 'Lato'; margin-top: 0;">
+                Nowa lokalizacja
+            </h2>        
+        </div>
+        <div class="col-md-4">
+            <i class="fa fa-map-marker fa-3x" style="float: right;"></i>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(x => x.Name)
+        </div>
+        <div class="col-md-10">
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Name, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(x => x.Description)
+        </div>
+        <div class="col-md-10">
+            @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @style = "resize: none; height: 100px;" })
+            @Html.ValidationMessageFor(x => x.Description, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(x => x.Image1)
+        </div>
+        <div class="col-md-10">
+            <ul id="ul-spot-images">
+                <li>
+                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png"/>
+                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                </li>
+                <li>
+                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                </li>
+                <li>
+                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                </li>
+                <li>
+                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                </li>
+                <li>
+                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                </li>
+            </ul>
+            <a id="btnAddPhoto" class="btn btn-primary btn-md" style="margin-top: 54px;"><i class="fa fa-image"></i>&nbsp;Dodaj zdjęcie</a>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+            <div id="map" style="height: 400px; width: 100%;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-10">
+            <div class="input-group">
+                <input id="txtSpotAddress" type="text" class="form-control" placeholder="Adres miejsca">
+                <span class="input-group-btn">
+                    <button id="btnFindOnMap" class="btn btn-primary btn-secondary" type="button">
+                        <i class="fa fa-search"></i>&nbsp;Szukaj</button>
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(x => x.CoorX)
+        </div>
+        <div class="col-md-10">
+            @Html.TextBoxFor(x => x.CoorX, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.CoorX, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-2">
+            @Html.LabelFor(x => x.CoorY)
+        </div>
+        <div class="col-md-10">
+            @Html.TextBoxFor(x => x.CoorY, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.CoorY, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">        
+            <button type="submit" class="btn btn-warning btn-md pull-right" style="min-width: 80px;">
+                <i class="fa fa-plus"></i>&nbsp;Zapisz</button>
+        </div>
+    </div>
+}
