@@ -1,0 +1,39 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model List<RoleViewModel>
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Role użytkowników";
+    ViewBag.IconClass = "fa fa-list";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.ROLES;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <table id="table-categories" class="data-table table table-striped table-bordered" width="100%" cellspacing="0" style="border: 0;">
+            <thead>
+                <tr>
+                    <th style="width: 50%;">Identyfikator</th>                    
+                    <th style="width: 50%;">Nazwa</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (RoleViewModel objRoleViewModel in Model)
+                    {
+                        <tr>
+                            <td>@objRoleViewModel.RoleId</td>
+                            <td>@objRoleViewModel.Name</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th style="width: 50%;">Identyfikator</th>
+                    <th style="width: 50%;">Nazwa</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>

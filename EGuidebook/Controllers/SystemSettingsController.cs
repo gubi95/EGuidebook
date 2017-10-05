@@ -7,7 +7,7 @@ using EGuidebook.Models;
 
 namespace EGuidebook.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Administrator")]
     public class SystemSettingsController : Controller
     {
         [HttpGet]

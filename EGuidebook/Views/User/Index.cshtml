@@ -1,0 +1,51 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model List<UserViewModel>
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Użytkownicy";
+    ViewBag.IconClass = "fa fa-users";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.USERS;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <table id="table-categories" class="data-table table table-striped table-bordered" width="100%" cellspacing="0" style="border: 0;">
+            <thead>
+                <tr>
+                    <th style="width: 40%;">Nazwa użytkownika</th>
+                    <th style="width: 40%;">Rola</th>
+                    <th style="width: 20%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (UserViewModel objUserViewModel in Model)
+                    {
+                        <tr>
+                            <td>@objUserViewModel.Username</td>
+                            <td>@objUserViewModel.Role.Name</td>
+                            <td style="text-align: center;">
+                                <a href="/User/Edit/@objUserViewModel.UserId" class="btn btn-primary btn-xs">
+                                    <i class="fa fa-pencil"></i>&nbsp;Edycja
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Nazwa użytkownika</th>
+                    <th>Rola</th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row" style="padding-top: 10px;">
+    <div class="col-md-12">
+        <a class="btn btn-warning btn-md pull-right" href="/User/Create"><i class="fa fa-plus"></i>&nbsp;Nowy użytkownik</a>
+    </div>
+</div>

@@ -1,0 +1,67 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model SpotCategoryViewModel
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Edycja kategorii";
+    ViewBag.IconClass = "fa fa-pencil";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.CATEGORIES;
+}
+
+@section scripts {
+    <script>
+        jQuery(document).ready(function () {
+            jQuery('#icon-uploader').on('change', function (event) {
+                var tmp = URL.createObjectURL(event.target.files[0]);
+                var filename = event.target.files[0].name;
+                jQuery('#img-icon').attr('src', tmp);
+                jQuery('#IconPath').val(filename);
+            });
+        });
+
+        function openFileUploader() {
+            jQuery('#icon-uploader').trigger('click');
+        }
+
+        function deleteIcon() {
+            jQuery('#icon-uploader').val('');
+            jQuery('#IconPath').val('');
+            jQuery('#img-icon').attr('src', '@Helper.NoPhotoImgPath');
+        }
+    </script>
+}
+
+@using (Html.BeginForm("Edit", "SpotCategory", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <input type="file" id="icon-uploader" name="icon" style="display: none" />
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.Name)
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Name, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            <div style="width: calc(100% - 35px); float: left;">
+                @Html.LabelFor(x => x.IconPath)
+                <div class="input-group">
+                    @Html.TextBoxFor(x => x.IconPath, new { @class = "form-control", @readonly = "readonly" })
+                    <span class="input-group-btn">
+                        <button class="btn btn-primary" type="button" onclick="openFileUploader()"><i class="fa fa-upload"></i>&nbsp;Przeglądaj</button>
+                        <button class="btn btn-danger" type="button" onclick="deleteIcon()"><i class="fa fa-trash"></i>&nbsp;Usuń</button>
+                    </span>
+                </div>
+            </div>
+            <img id="img-icon" src="@(Helper.CheckIfFileExists(Model.IconPath) ? Model.IconPath : Helper.NoPhotoImgPath )" style="width: 24px; height: 24px; float: right; margin-top: 30px;" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
+            <a class="btn btn-danger btn-md pull-right" onclick="jQuery('#form-delete').submit()" style="margin-right: 10px;"><i class="fa fa-trash"></i>&nbsp;Usuń</a>
+        </div>
+    </div>
+}
+
+@using (Html.BeginForm("Delete", "SpotCategory", new { @id = Model.SpotCategoryId }, FormMethod.Post, new { @id = "form-delete" })) { }

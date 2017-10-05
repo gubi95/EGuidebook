@@ -157,6 +157,21 @@ namespace EGuidebook.Controllers
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
+            SpotModel o1 = new SpotModel()
+            {
+                Description = "opis1",                
+                CoorX = "coorx",
+                CoorY = "coory",
+                Image1Path = "path1"
+            };
+
+            SpotModel o2 = Newtonsoft.Json.JsonConvert.DeserializeObject<SpotModel>(Newtonsoft.Json.JsonConvert.SerializeObject(o1));
+
+            o2.Description += "_upd";
+            o2.Image1Path += "_aaa";
+
+            var changes = new GenericObjectDifferenceExtracter().getChanges(o1, o2).Where(x => x.Type == GenericObjectDifferenceExtracter.ObjectDifference.EnumObjectDifferenceType.CHANGED).ToList();
+
             if (TempData["ViewData"] != null)
             {
                 ViewData = (ViewDataDictionary)TempData["ViewData"];

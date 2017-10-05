@@ -1,6 +1,19 @@
 ﻿@using EGuidebook.Shared
+@using EGuidebook.Models
 @{
     Layout = null;
+
+    ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+    ApplicationUser objApplicationUser = objApplicationDbContext
+                                            .Users
+                                            .FirstOrDefault(x => x.UserName.Equals(this.User.Identity.Name));
+
+    string strRoleId = objApplicationUser.Roles.ToList()[0].RoleId;
+
+    var objUserRole = objApplicationDbContext
+                    .Roles
+                    .FirstOrDefault(x => x.Id.Equals(strRoleId));
 }
 <!DOCTYPE html>
 <html>
@@ -8,6 +21,7 @@
     <meta name="viewport" content="width=device-width" />
     <title>@ViewBag.Title</title>
     <link href="https://fonts.googleapis.com/css?family=Lato" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet"> 
 </head>
 <body>
     <style>
@@ -16,10 +30,12 @@
             padding: 0;
             background: url(/Content/assets/img/background.jpg) no-repeat center center fixed;
             background-size: cover;
+            height: 100%;
         }
 
         body {
-            background-color: rgba(0,0,0,0) !important;            
+            height: 100%;
+            background-color: rgba(0,0,0,0) !important;
         }
 
         .error-msg {
@@ -35,8 +51,8 @@
         }
 
         #side-menu li {
-            font-size: 18px;      
-            border-top: 1px solid #555;                        
+            font-size: 18px;
+            border-top: 1px solid #555;
         }
 
         #side-menu li:last-child {
@@ -74,6 +90,67 @@
             background-position: right -8px top 0;
             background-color: #444;
         }
+
+        .minimized #side-bar {
+            width: 50px !important;
+        }
+
+        .minimized #side-content {
+            width: calc(100% - 50px) !important;
+            padding-top: 70px !important;
+        }
+
+        .minimized .row-minimize {
+            display: none !important;
+        }
+
+        .minimized #side-menu li a span {
+            display: none !important;
+        }
+
+        .minimized #side-menu li a.selected {
+            background-image: url(/Content/assets/img/blue-menu-vertical-line.png) !important;
+        }
+
+        .minimized #side-menu li a {
+            padding-left: 3px !important;
+            text-align: center;
+        }
+
+        .minimized #side-menu li i {
+            margin-right: 0 !important;
+        }
+
+        @* DATATABLE FONT AWESOME OVERRIDE *@
+        table.dataTable thead th {
+            position: relative;
+            background-image: none !important;
+        }
+
+        table.dataTable thead th.sorting:after,
+        table.dataTable thead th.sorting_asc:after,
+        table.dataTable thead th.sorting_desc:after {
+            position: absolute;
+            top: 12px;
+            right: 8px;
+            display: block;
+            font-family: FontAwesome;
+        }
+
+        table.dataTable thead th.sorting:after {
+            content: "\f0dc";
+            color: #ddd;
+            font-size: 0.8em;
+            padding-top: 0.12em;
+        }
+
+        table.dataTable thead th.sorting_asc:after {
+            content: "\f0de";
+        }
+
+        table.dataTable thead th.sorting_desc:after {
+            content: "\f0dd";
+        }
     </style>
     
     @Scripts.Render("~/bundles/jquery")
@@ -81,83 +158,108 @@
     @Scripts.Render("~/bundles/bootstrap")
     @Scripts.Render("~/bundles/moment")
     @Scripts.Render("~/bundles/iCheck")
+    @Scripts.Render("~/bundles/bs-select")
     @Scripts.Render("~/bundles/scripts")
+    @Scripts.Render("~/bundles/jQueryDataTables")
+    @Scripts.Render("~/bundles/datetime-picker")
+    @Scripts.Render("~/bundles/touchspin")
     @Styles.Render("~/Content/css")
     @RenderSection("scripts", false)
+    <div id="main-container" style="display: table; width: 100%; height: 100%; position: relative;">
+        <div style="display: table-row; background-color: #FFF; overflow-x: hidden;">
+            <div id="btn-show-hide-menu" data-set="0" style="position: absolute; top: 0; left: 0; height: 40px; width: 100%; background-color: #212121; text-align: center;">
+                <i class="fa fa-bars" style="color: #FFF; position: absolute; top: 0; left: 4px; font-size: 38px; cursor: pointer;"></i>
+                <span style="font-size: 20px; color: #FFF; font-family: 'Lato'; line-height: 34px;">
+                    <i class="fa fa-calendar"></i>&nbsp;<span id="span-date-and-time"></span>
+                </span>
+            </div>
+            <div id="side-bar" style="display: table-cell; padding: 40px 10px 10px 10px; width: 240px; background-color: #212121;">
+                <div>
+                    <div class="row row-minimize" style="margin-top: 30px; padding-bottom: 15px;">
+                        <div class="col-md-12">
+                            <div style="padding: 10px; border: 1px solid #CCC; border-radius: 5px; width: auto; height: auto; text-align: center; margin: 0 auto; max-width: 147px;">
+                                <img src="@(Helper.CheckIfFileExists(objApplicationUser.AvatarImagePath) ? objApplicationUser.AvatarImagePath : Helper.NoPhotoImgPath)" style="width: 125px; height: 125px; border-radius: 5px;" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row row-minimize">
+                        <div class="col-md-12" style="color: #FFF; font-size: 20px; font-family: 'Lato'; text-align: center;">
+                            @(objApplicationUser.FirstName)<br />@(objApplicationUser.LastName)<br />---<br /><b>@(objUserRole.Name)</b>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12" style="padding-top: 50px; padding-left: 0; padding-right: 5px;">
+                            <ul id="side-menu">
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.DASHBOARD ? "selected" : "")" href="/Home"><i class="fa fa-dashboard"></i><span>Panel</span></a></li>
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.USERS ? "selected" : "")" href="/User"><i class="fa fa-users"></i><span>Użytkownicy</span></a></li>
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SPOTS ? "selected" : "")" href="/Spot"><i class="fa fa-university"></i><span>Miejsca</span></a></li>
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.CATEGORIES ? "selected" : "")" href="/SpotCategory"><i class="fa fa-glass"></i><span>Kategorie</span></a></li>
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SETTINGS ? "selected" : "")" href="/SystemSettings/Edit"><i class="fa fa-cogs"></i><span>Ustawienia</span></a></li>
+                                <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.ROLES ? "selected" : "")" href="/Role"><i class="fa fa-address-card-o"></i><span>Role użytkowników</span></a></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="row row-minimize" style="padding-top: 40px; padding-bottom: 20px;">
+                        <div class="col-md-12" style="text-align: center; color: #FFF; font-family: 'Lato'; font-size: 16px;">
+                            <span>Do końca sesji pozostało:</span><br />
+                            <b><span id="session-time-left"></span></b>
+                        </div>
+                    </div>
+                    <div class="row row-minimize" style="padding-bottom: 30px;">
+                        <div class="col-md-12" style="text-align: center; padding-top: 10px;">
+                            @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
+                            {
+                                <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-power-off"></i>&nbsp;Wyloguj</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    <div style="width: 100%; height: 100%; position: relative; background-color: #FFF; overflow: hidden;">
-        <div style="position: absolute; top: 0; left: 0; height: 40px; width: 100%; background-color: #212121; text-align: center;">
-            <i class="fa fa-bars" style="color: #FFF; position: absolute; top: 0; left: 4px; font-size: 38px; cursor: pointer;"></i>
-
-            <span style="font-size: 20px; color: #FFF; font-family: 'Lato'; line-height: 34px;">
-                <i class="fa fa-calendar"></i>&nbsp;<span id="span-date-and-time"></span>
-            </span>
-
-        </div>
-
-        <div style="margin-top: 40px; float: left; min-height: 600px; width: 240px; background-color: #212121; padding: 10px; padding-top: 0;">
-
-            <div style="height: 100%;">
-                <div class="row" style="margin-top: 30px; padding-bottom: 15px;">
+            <div id="side-content" style="display: table-cell; width: calc(100% - 240px); min-height: 300px; margin-top: 40px; padding: 30px;">
+                <div class="row">
                     <div class="col-md-12">
-                        <div style="padding: 10px; border: 1px solid #CCC; border-radius: 5px; width: auto; height: auto; text-align: center; margin: 0 auto; max-width: 147px;">
-                            <img src="~/Content/assets/img/ja.jpg" style="width: 125px; height: 125px; border-radius: 5px;" />
-                        </div>                        
+                        <h2 style="margin-top: 0;">@(!string.IsNullOrEmpty(ViewBag.IconClass) ? Html.Raw("<i class=\"" + ViewBag.IconClass + "\"></i>&nbsp;") : "")@ViewBag.Title</h2>
+                        <hr style="border-color: #CCC;" />
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-12" style="color: #FFF; font-size: 20px; font-family: 'Lato'; text-align: center;">
-                        Rafał<br />Gubała<br />---<br/><b>Administrator</b>
-                    </div>
-                </div>                
-                <div class="row">
-                    <div class="col-md-12" style="padding-top: 50px; padding-left: 0; padding-right: 5px;">
-                        <ul id="side-menu">
-                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.DASHBOARD ? "selected" : "")" href="/Home"><i class="fa fa-dashboard"></i>Panel</a></li>
-                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.USERS ? "selected" : "")"><i class="fa fa-users"></i>Użytkownicy</a></li>
-                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SPOTS ? "selected" : "")"><i class="fa fa-university"></i>Miejsca</a></li>
-                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.CATEGORIES ? "selected" : "")"><i class="fa fa-glass"></i>Kategorie</a></li>
-                            <li><a class="@(ViewBag.MenuItem == Helper.EnumSelectedMenuItem.SETTINGS ? "selected" : "")" href="/SystemSettings/Edit"><i class="fa fa-cogs"></i>Ustawienia</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="row" style="padding-top: 40px; padding-bottom: 20px;">
-                    <div class="col-md-12" style="text-align: center; color: #FFF; font-family: 'Lato'; font-size: 16px;">
-                        <span>Do końca sesji pozostało:</span><br/>
-                        <b><span id="session-time-left"></span></b>
-                    </div>
-                </div>
-                <div class="row" style="padding-bottom: 30px;">
-                    <div class="col-md-12" style="text-align: center; padding-top: 10px;">
-                        @using (Html.BeginForm("Logout", "Account", FormMethod.Post))
-                        {
-                            <button type="submit" class="btn btn-danger btn-sm"><i class="fa fa-power-off"></i>&nbsp;Wyloguj</button>
-                        }
-                    </div>
-                </div>
+                @RenderBody()
             </div>
-        </div>
-
-        <div style="width: calc(100% - 240px); float: right; height: 300px; margin-top: 40px; padding: 30px;">
-            <div class="row">
-                <div class="col-md-12">
-                    <h2 style="margin-top: 0;">@(!string.IsNullOrEmpty(ViewBag.IconClass) ? Html.Raw("<i class=\"" + ViewBag.IconClass + "\"></i>&nbsp;") : "")@ViewBag.Title</h2>
-                    <hr style="border-color: #CCC;" />
-                </div>
-            </div>
-            @RenderBody()
         </div>
     </div>
 
     <script>
         var sessionTimeSecondsLeft = 3600;
-        jQuery(document).ready(function () {            
+        jQuery(document).ready(function () {
+            onBrowserSizeChange(jQuery(window));
+            setOnBrowserSizeChange();
             setDateAndTime();
             setSessionTime();
             setInterval(setDateAndTime, 1000);
             setInterval(setSessionTime, 1000);
             setCheckBoxes();
+            setDataTables();
+            jQuery('#btn-show-hide-menu').on('click', btnShowHideMenuOnClick);
         });
+        function btnShowHideMenuOnClick() {
+            jQuery('#btn-show-hide-menu').attr('data-set', '1');
+            jQuery('#main-container').toggleClass('minimized');
+        }
+        function onBrowserSizeChange($window) {
+            if (jQuery('#btn-show-hide-menu').attr('data-set') == '0') {
+                if ($window.width() <= 1200) {
+                    jQuery('#main-container').addClass('minimized');
+                }
+                else {
+                    jQuery('#main-container').removeClass('minimized');
+                }
+            }
+        }
+        function setOnBrowserSizeChange() {
+            jQuery(window).on('resize', function () {
+                onBrowserSizeChange(jQuery(this));
+            });
+        }
         function setDateAndTime() {
             jQuery('#span-date-and-time').html(moment().format('DD-MM-YYYY HH:mm:ss'))
         }
@@ -174,6 +276,58 @@
         function setCheckBoxes() {
             jQuery('input[type="checkbox"]').iCheck({
                 checkboxClass: 'icheckbox_flat-blue'
+            });
+        }
+        function setDataTables() {
+            jQuery('.data-table').each(function () {
+                setDataTable(jQuery(this));
+            });
+        }
+        function setDataTable($table) {
+            $table.find('tfoot th').each(function () {
+                if (jQuery(this).attr('data-no-filter') != 'true') {
+                    jQuery(this).html('<input type="text" class="form-control" style="width: 100%; height: 28px; font-size: 12px;" placeholder="Szukaj: ' + jQuery(this).text().toLowerCase() + '" />');
+                }
+            });
+
+            var table = $table.DataTable({
+                'initComplete': function (settings, json) {
+                    $table.closest('.dataTables_wrapper').find('select').selectpicker();
+                },
+                "order": [[0, "desc"]],
+                language: {
+                    processing: 'Ładowanie... proszę czekać...',
+                    search: '<i class="fa fa-search"></i>&nbsp;Szukaj',
+                    lengthMenu: 'Pokaż _MENU_ pozycji',
+                    info: 'Znaleziono _END_ z _MAX_ rekordów',
+                    infoEmpty: 'Brak rekordów do wyświetlenia',
+                    infoFiltered: '',
+                    infoPostFix: '',
+                    loadingRecords: 'Ładowanie... proszę czekać...',
+                    zeroRecords: 'Brak rekordów do wyświetlenia',
+                    emptyTable: 'Brak rekordów do wyświetlenia',
+                    paginate: {
+                        first: 'Pierwszy',
+                        previous: 'Wstecz',
+                        next: 'Dalej',
+                        last: 'Ostatni'
+                    },
+                    aria: {
+                        sortAscending: ": activer pour trier la colonne par ordre croissant",
+                        sortDescending: ": activer pour trier la colonne par ordre décroissant"
+                    }
+                }
+            });
+
+            table.columns().every(function () {
+                var that = this;
+                jQuery('input', this.footer()).on('keyup change', function () {
+                    if (that.search() !== this.value) {
+                        that
+                            .search(this.value)
+                            .draw();
+                    }
+                });
             });
         }
     </script>

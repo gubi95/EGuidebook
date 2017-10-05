@@ -1,7 +1,157 @@
 ﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@using Newtonsoft.Json
+@model HomeViewModel
 @{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Panel administracyjny";
+    ViewBag.IconClass = "fa fa-dashboard";
     Layout = Helper.AdminLayoutPath;
     ViewBag.MenuItem = Helper.EnumSelectedMenuItem.DASHBOARD;
 }
 
+<style>
+    .tile {
+        position: relative;
+        -webkit-box-shadow: 3px 3px 5px 6px #ccc; /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+        -moz-box-shadow: 3px 3px 5px 6px #ccc; /* Firefox 3.5 - 3.6 */
+        box-shadow: 3px 3px 5px 6px #ccc; /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+        margin-bottom: 20px;
+        float: left;
+        margin-right: 20px;
+    }
+
+    .small-tile {
+        width: 350px;
+        height: 90px;
+    }
+
+    .small-tile .tile-header {
+        position: absolute;
+        left: 100px;
+        bottom: 9px;
+        font-family: 'Open Sans';
+        font-size: 20px;
+        color: #444;
+    }
+
+    .small-tile .tile-count-number {
+        position: absolute;
+        left: 100px;        
+        font-family: 'Open Sans';
+        font-size: 36px;
+        color: #444;
+    }
+
+    .small-tile hr {
+        position: absolute;
+        top: 30px;
+        left: 90px;
+        width: 260px;
+        border-color: #CCC;
+    }
+
+    .tile-left-bar {
+        width: 90px;
+        height: 100%;
+        float: left;
+        background-color: #212121;
+        text-align: center;
+    }
+
+    .tile-left-bar .fa {
+        font-size: 56px;
+        text-align: center;
+        line-height: 88px;
+        color: #DEDEDE;
+    }
+</style>
+
+<script>
+    var map = null;
+     var geocoder = null;
+     function initMap(reloadAutocomplete) {
+         var divMap = document.getElementById('map');
+
+         if (divMap == null) {
+             setTimeout(initMap, 100);
+             return;
+         }
+
+         var uluru = { lat: 51.9908627, lng: 19.4516549 };
+         var markers = JSON.parse('@Html.Raw(HttpUtility.JavaScriptStringEncode(JsonConvert.SerializeObject(Model.SpotCoordinatesList)))');
+
+         geocoder = new google.maps.Geocoder();
+         map = new google.maps.Map(divMap, {
+             zoom: 6,
+             center: uluru
+         });
+
+         var infoWindow = new google.maps.InfoWindow();
+
+         for (i = 0; i < markers.length; i++) {
+             var position = new google.maps.LatLng(markers[i].CoorX, markers[i].CoorY);
+             marker = new google.maps.Marker({
+                 position: position,
+                 map: map,
+                 icon: '/Content/assets/img/map-pin.png'
+             });
+             
+             google.maps.event.addListener(marker, 'click', (function (marker, spot_name, spot_description, arr_image_paths) {
+                 return function () {
+                     var infoWindowContent =
+                         '<div class="info_content">' +
+                         '<h3>' + spot_name + '</h3>' +
+                         '<p>' + spot_description + '</p>';
+
+                     for (var j = 0; j < arr_image_paths.length; j++) {
+                         if (arr_image_paths[j] == '') {
+                             break;
+                         }
+
+                         infoWindowContent += '<img src="' + arr_image_paths[j] + '" style="width: 40px; height: 40px; margin-right: 5px;" />';
+                     }
+
+                     infoWindowContent += '</div>';
+                     infoWindow.setContent(infoWindowContent);
+                     infoWindow.open(map, marker);
+                 }
+             })(marker, markers[i].Name, markers[i].Description, markers[i].ImagePaths));
+         }
+     }
+</script>
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&libraries=places&callback=initMap"></script>
+
+<div class="tile small-tile green-tile">
+    <div class="tile-left-bar">
+        <i class="fa fa-users"></i>
+    </div>
+    <span class="tile-count-number">@Model.UsersCount</span>
+    <hr/>
+    <span class="tile-header">Użytkownicy</span>
+</div>
+<div class="tile small-tile green-tile">
+    <div class="tile-left-bar">
+        <i class="fa fa-map-marker"></i>
+    </div>
+    <span class="tile-count-number">@Model.SpotsCount</span>
+    <hr />
+    <span class="tile-header">Miejsca</span>
+</div>
+<div class="tile small-tile green-tile">
+    <div class="tile-left-bar">
+        <i class="fa fa-glass"></i>
+    </div>
+    <span class="tile-count-number">@Model.SpotCategoriesCount</span>
+    <hr />
+    <span class="tile-header">Kategorie</span>
+</div>
+
+<div class="tile" style="width: calc(100% - 90px); margin-left: 90px;">
+    <div style="position: absolute; left: -90px; width: 90px; height: 90px; background-color: #212121; text-align: center;">
+        <i class="fa fa-map" style="color: #DEDEDE; font-size: 56px; line-height: 88px;"></i>
+    </div>
+    <div style="width: 100%; padding: 10px;">
+        <div id="map" style="height: 500px; width: 100%;"></div>
+    </div>    
+</div>

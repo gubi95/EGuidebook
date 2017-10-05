@@ -88,12 +88,21 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Web.Http, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.5.2.3\lib\net45\System.Web.Http.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web.Http.WebHost, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.5.2.3\lib\net45\System.Web.Http.WebHost.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -197,10 +206,23 @@
     <Compile Include="App_Start\IdentityConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
+    <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Areas\WebAPI\Controllers\SpotCategoryController.cs" />
+    <Compile Include="Areas\WebAPI\Controllers\SpotController.cs" />
+    <Compile Include="Areas\WebAPI\Controllers\SpotGradeController.cs" />
+    <Compile Include="Areas\WebAPI\Controllers\UserController.cs" />
+    <Compile Include="Areas\WebAPI\Models\SpotCategoryWebAPIModel.cs" />
+    <Compile Include="Areas\WebAPI\Models\SpotWebAPIModel.cs" />
+    <Compile Include="Areas\WebAPI\Models\WebAPIResponse.cs" />
+    <Compile Include="Areas\WebAPI\WebAPIAreaRegistration.cs" />
+    <Compile Include="Areas\WebAPI\WebAPIBasicAuth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\RoleController.cs" />
+    <Compile Include="Controllers\SpotCategoryController.cs" />
     <Compile Include="Controllers\SpotController.cs" />
     <Compile Include="Controllers\SystemSettingsController.cs" />
+    <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -228,15 +250,61 @@
     <Compile Include="Migrations\201707161254003_SpotModel_CoorString.Designer.cs">
       <DependentUpon>201707161254003_SpotModel_CoorString.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201707221153472_SpotCategoryModel.cs" />
+    <Compile Include="Migrations\201707221153472_SpotCategoryModel.Designer.cs">
+      <DependentUpon>201707221153472_SpotCategoryModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708131433445_UserProfile_Avatar_FirstName_LastName.cs" />
+    <Compile Include="Migrations\201708131433445_UserProfile_Avatar_FirstName_LastName.Designer.cs">
+      <DependentUpon>201708131433445_UserProfile_Avatar_FirstName_LastName.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708281636301_SpotGradeModel.cs" />
+    <Compile Include="Migrations\201708281636301_SpotGradeModel.Designer.cs">
+      <DependentUpon>201708281636301_SpotGradeModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708281643466_SpotGrade_CreationDate.cs" />
+    <Compile Include="Migrations\201708281643466_SpotGrade_CreationDate.Designer.cs">
+      <DependentUpon>201708281643466_SpotGrade_CreationDate.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201708291415427_Spot_OpeningHours_Tickers_Images_CategoryID.cs" />
+    <Compile Include="Migrations\201708291415427_Spot_OpeningHours_Tickers_Images_CategoryID.Designer.cs">
+      <DependentUpon>201708291415427_Spot_OpeningHours_Tickers_Images_CategoryID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709021743008_TableRenames.cs" />
+    <Compile Include="Migrations\201709021743008_TableRenames.Designer.cs">
+      <DependentUpon>201709021743008_TableRenames.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709021757488_RouteModel.cs" />
+    <Compile Include="Migrations\201709021757488_RouteModel.Designer.cs">
+      <DependentUpon>201709021757488_RouteModel.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709021807035_Spot_Route_ManyToMany.cs" />
+    <Compile Include="Migrations\201709021807035_Spot_Route_ManyToMany.Designer.cs">
+      <DependentUpon>201709021807035_Spot_Route_ManyToMany.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201709232120257_Spots_Routes_Table_Rename.cs" />
+    <Compile Include="Migrations\201709232120257_Spots_Routes_Table_Rename.Designer.cs">
+      <DependentUpon>201709232120257_Spots_Routes_Table_Rename.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AlertBoxViewModel.cs" />
+    <Compile Include="Models\EditUserViewModel.cs" />
+    <Compile Include="Models\HomeViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\RoleViewModel.cs" />
+    <Compile Include="Models\RouteModel.cs" />
+    <Compile Include="Models\SpotCategoryModel.cs" />
+    <Compile Include="Models\SpotCategoryViewModel.cs" />
+    <Compile Include="Models\SpotGradeModel.cs" />
+    <Compile Include="Models\SpotGradeViewModel.cs" />
     <Compile Include="Models\SpotModel.cs" />
     <Compile Include="Models\SpotViewModel.cs" />
     <Compile Include="Models\SystemSettingsModel.cs" />
     <Compile Include="Models\SystemSettingsViewModel.cs" />
+    <Compile Include="Models\UserViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Shared\GenericObjectDifferenceExtracter.cs" />
     <Compile Include="Shared\Helper.cs" />
     <Compile Include="Shared\SMTPManager.cs" />
     <Compile Include="Startup.cs" />
@@ -255,8 +323,372 @@
     <Content Include="Content\assets\img\no-photo.png" />
     <Content Include="Content\assets\img\no-user-photo.png" />
     <Content Include="Content\assets\img\x-icon.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\.gitignore" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\css\bootstrap-select.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\css\bootstrap-select.min.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\bootstrap-select.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\bootstrap-select.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ar_AR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ar_AR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-bg_BG.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-bg_BG.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-cro_CRO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-cro_CRO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-cs_CZ.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-cs_CZ.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-da_DK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-da_DK.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-de_DE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-de_DE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-en_US.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-en_US.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-es_CL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-es_CL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-es_ES.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-es_ES.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-et_EE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-et_EE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-eu.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-eu.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fa_IR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fa_IR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fi_FI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fi_FI.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fr_FR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-fr_FR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-hu_HU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-hu_HU.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-id_ID.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-id_ID.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-it_IT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-it_IT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ja_JP.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ja_JP.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-kh_KM.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-kh_KM.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ko_KR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ko_KR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-lt_LT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-lt_LT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-nb_NO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-nb_NO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-nl_NL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-nl_NL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pl_PL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pl_PL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pt_BR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pt_BR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pt_PT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-pt_PT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ro_RO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ro_RO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ru_RU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ru_RU.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sk_SK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sk_SK.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sl_SI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sl_SI.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sv_SE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-sv_SE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-tr_TR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-tr_TR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ua_UA.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-ua_UA.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-vi_VN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-vi_VN.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-zh_CN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-zh_CN.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-zh_TW.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\i18n\defaults-zh_TW.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\base.html" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\css\base.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\convertizer.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\estimateit.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\membermeister.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\snapappointments.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\solveforall.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\img\logos\thermofisher.png" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\js\base.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\nav.html" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\custom_theme\toc.html" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\css\custom.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\css\bootstrap-select.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\css\bootstrap-select.min.css" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\bootstrap-select.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\bootstrap-select.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ar_AR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ar_AR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-bg_BG.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-bg_BG.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-cro_CRO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-cro_CRO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-cs_CZ.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-cs_CZ.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-da_DK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-da_DK.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-de_DE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-de_DE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-en_US.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-en_US.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-es_CL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-es_CL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-es_ES.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-es_ES.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-et_EE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-et_EE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-eu.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-eu.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fa_IR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fa_IR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fi_FI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fi_FI.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fr_FR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-fr_FR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-hu_HU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-hu_HU.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-id_ID.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-id_ID.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-it_IT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-it_IT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ja_JP.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ja_JP.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-kh_KM.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-kh_KM.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ko_KR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ko_KR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-lt_LT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-lt_LT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-nb_NO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-nb_NO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-nl_NL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-nl_NL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pl_PL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pl_PL.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pt_BR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pt_BR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pt_PT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-pt_PT.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ro_RO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ro_RO.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ru_RU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ru_RU.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sk_SK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sk_SK.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sl_SI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sl_SI.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sv_SE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-sv_SE.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-tr_TR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-tr_TR.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ua_UA.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-ua_UA.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-vi_VN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-vi_VN.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-zh_CN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-zh_CN.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-zh_TW.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\i18n\defaults-zh_TW.min.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\playground\index.html" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\playground\plnkrOpener.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\playground\test.html" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\Gruntfile.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\bootstrap-select.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ar_AR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-bg_BG.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-cro_CRO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-cs_CZ.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-da_DK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-de_DE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-en_US.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-es_CL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-es_ES.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-et_EE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-eu.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-fa_IR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-fi_FI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-fr_FR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-hu_HU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-id_ID.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-it_IT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ja_JP.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-kh_KM.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ko_KR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-lt_LT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-nb_NO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-nl_NL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-pl_PL.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-pt_BR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-pt_PT.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ro_RO.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ru_RU.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-sk_SK.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-sl_SI.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-sv_SE.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-tr_TR.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-ua_UA.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-vi_VN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-zh_CN.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\i18n\defaults-zh_TW.js" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\test.html" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\.gitignore" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\demo\demo.css" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\demo\favicon.ico" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\demo\index.html" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\dist\jquery.bootstrap-touchspin.css" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\dist\jquery.bootstrap-touchspin.js" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\dist\jquery.bootstrap-touchspin.min.css" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\dist\jquery.bootstrap-touchspin.min.js" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\Gruntfile.js" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\src\jquery.bootstrap-touchspin.css" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\src\jquery.bootstrap-touchspin.js" />
+    <Content Include="Content\assets\js\icheck-1.x\.gitignore" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\banner.jpg" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\custom.css" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\icheck.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\arrow-bottom.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\arrow-top.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\header-line.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\icon-fork.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\icon-github.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\icon-lab.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\icon-options.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\ie\icon-star.png" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-bold.svg" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-regular.svg" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\normalize.css" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\index.html" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\js\custom.js" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\js\custom.min.js" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\js\jquery.js" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\js\zepto.js" />
+    <Content Include="Content\assets\js\icheck-1.x\icheck.js" />
+    <Content Include="Content\assets\js\icheck-1.x\icheck.min.js" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\all.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\aero%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\aero.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\aero.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\blue%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\blue.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\blue.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\flat%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\flat.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\flat.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\green%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\green.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\green.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\grey%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\grey.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\grey.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\orange%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\orange.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\orange.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\pink%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\pink.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\pink.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\purple%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\purple.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\purple.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\red%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\red.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\red.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\yellow%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\yellow.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\yellow.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\flat\_all.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\futurico\futurico%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\futurico\futurico.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\futurico\futurico.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\aero.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\blue.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\green.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\grey.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\line%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\line.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\line.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\orange.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\pink.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\purple.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\red.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\yellow.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\line\_all.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\aero%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\aero.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\aero.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\blue%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\blue.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\blue.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\green%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\green.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\green.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\grey%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\grey.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\grey.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\minimal%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\minimal.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\minimal.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\orange%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\orange.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\orange.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\pink%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\pink.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\pink.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\purple%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\purple.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\purple.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\red%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\red.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\red.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\yellow%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\yellow.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\yellow.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\minimal\_all.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\polaris\polaris%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\polaris\polaris.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\polaris\polaris.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\aero%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\aero.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\aero.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\blue%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\blue.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\blue.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\green%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\green.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\green.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\grey%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\grey.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\grey.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\orange%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\orange.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\orange.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\pink%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\pink.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\pink.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\purple%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\purple.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\purple.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\red%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\red.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\red.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\square%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\square.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\square.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\yellow%402x.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\yellow.css" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\yellow.png" />
+    <Content Include="Content\assets\js\icheck-1.x\skins\square\_all.css" />
+    <Content Include="Content\assets\js\jQuery-DataTable-1.10.15\DataTable.min.js" />
+    <Content Include="Content\assets\js\jQuery-DataTable-1.10.15\styles.css" />
+    <None Include="Content\assets\js\jQuery\jquery-1.10.2.intellisense.js" />
+    <Content Include="Content\assets\js\jQuery\jquery-1.10.2.js" />
+    <Content Include="Content\assets\js\jQuery\jquery-1.10.2.min.js" />
+    <None Include="Content\assets\js\jQuery\jquery.validate-vsdoc.js" />
+    <Content Include="Content\assets\js\jQuery\jquery.validate.js" />
+    <Content Include="Content\assets\js\jQuery\jquery.validate.min.js" />
+    <Content Include="Content\assets\js\jQuery\jquery.validate.unobtrusive.js" />
+    <Content Include="Content\assets\js\jQuery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Content\assets\js\moment-with-locales.js" />
     <Content Include="Content\assets\js\scripts.js" />
+    <Content Include="Content\assets\bootstrap-datetimepicker\bootstrap-datetimepicker.min.css" />
     <Content Include="Content\Site.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
@@ -306,6 +738,7 @@
     <Content Include="Content\assets\font-awesome-4.7.0\scss\_screen-reader.scss" />
     <Content Include="Content\assets\font-awesome-4.7.0\scss\_stacked.scss" />
     <Content Include="Content\assets\font-awesome-4.7.0\scss\_variables.scss" />
+    <Content Include="Areas\WebAPI\Views\web.config" />
     <None Include="Content\assets\jQuery\jquery-1.10.2.intellisense.js" />
     <Content Include="Content\assets\bootstrap\js\bootstrap.js" />
     <Content Include="Content\assets\bootstrap\js\bootstrap.min.js" />
@@ -320,7 +753,10 @@
     <Content Include="Content\assets\js\respond.js" />
     <Content Include="Content\assets\js\respond.min.js" />
     <Content Include="Content\assets\js\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Content\assets\bootstrap-datetimepicker\bootstrap-datetimepicker.min.js" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -337,13 +773,68 @@
     <Content Include="Views\Spot\Create.cshtml" />
     <Content Include="Views\Shared\_AdminLayout.cshtml" />
     <Content Include="Views\SystemSettings\Edit.cshtml" />
+    <Content Include="Views\SpotCategory\Create.cshtml" />
+    <Content Include="Views\SpotCategory\Edit.cshtml" />
+    <Content Include="Views\SpotCategory\Index.cshtml" />
+    <Content Include="Views\Role\Index.cshtml" />
+    <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\User\Create.cshtml" />
+    <Content Include="Views\User\Edit.cshtml" />
+    <Content Include="Views\Spot\Index.cshtml" />
+    <Content Include="Views\Spot\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\SpotViewModel\" />
+    <Folder Include="Areas\WebAPI\Views\Shared\" />
+    <Folder Include="Scripts\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\.github\ISSUE_TEMPLATE.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\bower.json" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\CHANGELOG.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\composer.json" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\CONTRIBUTING.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\css\bootstrap-select.css.map" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\dist\js\bootstrap-select.js.map" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\css\bootstrap-select.css.map" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\dist\js\bootstrap-select.js.map" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\examples.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\index.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\methods.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\docs\options.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\docs\mkdocs.yml" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\js\.jshintrc" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\less\bootstrap-select.less" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\less\variables.less" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\LICENSE" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\nuget\bootstrap-select.nuspec" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\nuget\MyGet.ps1" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\package.json" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\README.md" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\sass\bootstrap-select.scss" />
+    <Content Include="Content\assets\js\bootstrap-select-1.12.4\sass\variables.scss" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\.editorconfig" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\.jshintrc" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\.travis.yml" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\bootstrap-touchspin.jquery.json" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\bower.json" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\CONTRIBUTING.md" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\LICENSE.md" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\package.json" />
+    <Content Include="Content\assets\js\bootstrap-touchspin-master\README.md" />
+    <Content Include="Content\assets\js\icheck-1.x\bower.json" />
+    <Content Include="Content\assets\js\icheck-1.x\CHANGELOG.md" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\custom.styl" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-bold.eot" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-bold.ttf" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-bold.woff" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-regular.eot" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-regular.ttf" />
+    <Content Include="Content\assets\js\icheck-1.x\demo\css\montserrat-regular.woff" />
+    <Content Include="Content\assets\js\icheck-1.x\icheck.jquery.json" />
+    <Content Include="Content\assets\js\icheck-1.x\README.md" />
+    <Content Include="Content\assets\js\jQuery\jquery-1.10.2.min.map" />
     <None Include="Project_Readme.html" />
     <Content Include="Content\assets\jQuery\jquery-1.10.2.min.map" />
   </ItemGroup>
@@ -365,6 +856,33 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201707161254003_SpotModel_CoorString.resx">
       <DependentUpon>201707161254003_SpotModel_CoorString.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201707221153472_SpotCategoryModel.resx">
+      <DependentUpon>201707221153472_SpotCategoryModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708131433445_UserProfile_Avatar_FirstName_LastName.resx">
+      <DependentUpon>201708131433445_UserProfile_Avatar_FirstName_LastName.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708281636301_SpotGradeModel.resx">
+      <DependentUpon>201708281636301_SpotGradeModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708281643466_SpotGrade_CreationDate.resx">
+      <DependentUpon>201708281643466_SpotGrade_CreationDate.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201708291415427_Spot_OpeningHours_Tickers_Images_CategoryID.resx">
+      <DependentUpon>201708291415427_Spot_OpeningHours_Tickers_Images_CategoryID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709021743008_TableRenames.resx">
+      <DependentUpon>201709021743008_TableRenames.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709021757488_RouteModel.resx">
+      <DependentUpon>201709021757488_RouteModel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709021807035_Spot_Route_ManyToMany.resx">
+      <DependentUpon>201709021807035_Spot_Route_ManyToMany.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201709232120257_Spots_Routes_Table_Rename.resx">
+      <DependentUpon>201709232120257_Spots_Routes_Table_Rename.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

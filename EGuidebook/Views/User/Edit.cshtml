@@ -1,0 +1,153 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model EditUserViewModel
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Edycja użytkownika";
+    ViewBag.IconClass = "fa fa-user";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.USERS;
+
+    List<SelectListItem> listSelectListItem = Model.Roles.Select(x => new SelectListItem() { Text = x.Name, Value = x.RoleId, Selected = false }).ToList();
+    if (listSelectListItem.Find(x => x.Value.Equals(Model.RoleId)) != null)
+    {
+        listSelectListItem.Find(x => x.Value.Equals(Model.RoleId)).Selected = true;
+    }
+    else
+    {
+        listSelectListItem[0].Selected = true;
+    }
+}
+
+@section scripts {
+    <script>
+        jQuery(document).ready(function () {
+            jQuery('#ddl-role-id').on('change', function () {
+                ddlRoleIDOnChange(jQuery(this));
+            });
+
+            jQuery('#user_avatar').on('change', function (event) {
+                var tmp = URL.createObjectURL(event.target.files[0]);
+                var filename = event.target.files[0].name;
+                jQuery('#img-user-avatar').attr('src', tmp);
+                jQuery('#AvatarImagePath').val(filename);
+            });
+
+            jQuery('#txtUserPassword').on('keyup', updatePasswordRules);
+            jQuery('#txtUserPasswordRepeat').on('keyup', updatePasswordRules);
+            updatePasswordRules();
+
+            jQuery('#form-update-user').validate().settings.ignore = '.ignore';
+        });
+
+        function ddlRoleIDOnChange($ddl) {
+            if ($ddl.selectpicker('val') == 'ADM') {
+                jQuery('.row-only-for-admin').show();
+                jQuery('.row-only-for-admin').each(function () {
+                    var originalValue = $ddl.attr('data-original-value');
+                    $ddl.find('input').val(originalValue != undefined ? originalValue : '');
+                });
+            }
+            else {
+                jQuery('.row-only-for-admin').hide();
+                jQuery('.row-only-for-admin input').val('');
+            }
+        }
+
+        function openUserAvatarUploader() {
+            jQuery('#user_avatar').trigger('click');
+        }
+
+        function deleteUserAvatar() {
+            jQuery('#img-user-avatar').attr('src', '@Helper.NoPhotoImgPath');
+            jQuery('#AvatarImagePath').val('');
+            jQuery('#user_avatar').val('');
+        }
+
+        function updatePasswordRules() {
+            if (jQuery('#txtUserPassword').val() != '' || jQuery('#txtUserPasswordRepeat').val() != '') {
+                jQuery('#txtUserPassword').removeClass('ignore');
+                jQuery('#txtUserPasswordRepeat').removeClass('ignore');
+            }
+            else {
+                jQuery('#txtUserPassword').addClass('ignore');
+                jQuery('#txtUserPasswordRepeat').addClass('ignore');
+            }
+        }        
+    </script>
+}
+
+@using (Html.BeginForm("Edit", "User", FormMethod.Post, new { @id = "form-update-user", @enctype = "multipart/form-data" }))
+{
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.Username)
+            @Html.TextBoxFor(x => x.Username, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Username, null, new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.RoleId)
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.DropDownListFor(x => x.RoleId, listSelectListItem, new { @id = "ddl-role-id", @class = "selectpicker" })
+            @Html.ValidationMessageFor(x => x.RoleId, null, new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row row-only-for-admin">
+        <div class="col-md-10">
+            <div class="row row-only-for-admin" style="padding-bottom: 10px;" data-original-value="@Model.FirstName">
+                <div class="col-md-12">
+                    @Html.LabelFor(x => x.FirstName)
+                    @Html.TextBoxFor(x => x.FirstName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.FirstName, null, new { @class = "error-msg" })
+                </div>
+            </div>
+            <div class="row row-only-for-admin" style="padding-bottom: 10px;" data-original-value="@Model.LastName">
+                <div class="col-md-12">
+                    @Html.LabelFor(x => x.LastName)
+                    @Html.TextBoxFor(x => x.LastName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.LastName, null, new { @class = "error-msg" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-2">
+            <img src="@(Helper.CheckIfFileExists(Model.AvatarImagePath) ? Model.AvatarImagePath : Helper.NoPhotoImgPath)" id="img-user-avatar" style="margin-top: 13px; width: 128px; height: 128px;" />
+            <input id="user_avatar" type="file" name="user_avatar" style="display: none;" />
+        </div>
+    </div>
+    <div class="row row-only-for-admin" style="padding-bottom: 10px;" data-original-value="@Model.AvatarImagePath">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.AvatarImagePath)
+            <div class="input-group">
+                @Html.TextBoxFor(x => x.AvatarImagePath, new { @class = "form-control", @readonly = "readonly" })
+                <span class="input-group-btn">
+                    <button type="button" class="btn btn-primary" onclick="openUserAvatarUploader()"><i class="fa fa-upload"></i>&nbsp;Przeglądaj</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteUserAvatar()"><i class="fa fa-trash"></i>&nbsp;Usuń</button>
+                </span>
+            </div>
+            @Html.ValidationMessageFor(x => x.AvatarImagePath, null, new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row row-only-for-admin" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.UserPassword)
+            @Html.PasswordFor(x => x.UserPassword, new { @id = "txtUserPassword", @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.UserPassword, null, new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row row-only-for-admin" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.UserPasswordRepeat)
+            @Html.PasswordFor(x => x.UserPasswordRepeat, new { @id = "txtUserPasswordRepeat", @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.UserPasswordRepeat, null, new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
+        </div>
+    </div>
+}

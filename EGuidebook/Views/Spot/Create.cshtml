@@ -2,7 +2,13 @@
 @using EGuidebook.Shared
 @model SpotViewModel
 @{
-    Layout = Helper.MainLayoutPath;
+    ViewBag.Title = "Nowe miejsce";
+    ViewBag.IconClass = "fa fa-map-marker";
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.SPOTS;
+
+    ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+    List<SpotCategoryModel> listSpotCategoryModel = objApplicationDbContext.SpotCategories.ToList();
 }
 
 <style>
@@ -44,29 +50,48 @@
         float: left;
         position: relative;
     }
+
+    .tab-pane {
+        padding: 10px;
+        padding-top: 30px;
+    }
+
+    .nav-pills li:not(.active) a {
+        border: 1px solid #CCC;
+    }
 </style>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&callback=initMap"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&libraries=places&callback=initMap"></script>
 
 @section scripts {
  <script>
      var map = null;
      var geocoder = null;
      function initMap() {
-         var uluru = { lat: -25.363, lng: 131.044 };
+         var divMap = document.getElementById('map');
+
+         if (divMap == null) {
+             setTimeout(initMap, 100);
+             return;
+         }
+
+         var uluru = { lat: 51.1078939, lng: 17.0616995 };
+
          geocoder = new google.maps.Geocoder();
-         map = new google.maps.Map(document.getElementById('map'), {
+         map = new google.maps.Map(divMap, {
              zoom: 16,
              center: uluru
          });
          var marker = new google.maps.Marker({
+             map: map,
              position: uluru,
-             map: map
+             icon: '/Content/assets/img/map-pin.png'
          });
+
+         initAutocomplete();
      }
 
-     function findOnMap() {         
-         var address = jQuery('#txtSpotAddress').val();
+     function findOnMap(address) {
          geocoder.geocode({ 'address': address = address }, function (results, status) {
              if (status == google.maps.GeocoderStatus.OK) {
                  map.setCenter(results[0].geometry.location);
@@ -79,6 +104,48 @@
                  });
              }
          });
+     }
+
+     var placeSearch, autocomplete;
+     var componentForm = {
+         street_number: 'short_name',
+         route: 'long_name',
+         locality: 'long_name',
+         administrative_area_level_1: 'short_name',
+         country: 'long_name',
+         postal_code: 'short_name'
+     };
+
+     function initAutocomplete() {
+         autocomplete = new google.maps.places.Autocomplete(
+             (document.getElementById('txtSpotAddress')),
+             { types: ['geocode'] });
+         autocomplete.addListener('place_changed', fillInAddress);
+     }
+
+     function fillInAddress() {
+         var place = autocomplete.getPlace();
+
+         var street = '';
+         var street_number = '';
+         var city = '';
+
+         for (var i = 0; i < place.address_components.length; i++) {
+             var addressType = place.address_components[i].types[0];
+             var value = place.address_components[i][componentForm[addressType]];
+
+             if (addressType == 'street_number') {
+                 street_number = value;
+             }             
+             else if (addressType == 'route') {
+                 street = value;
+             }             
+             else if (addressType == 'locality') {
+                 city = value;
+             }             
+         }
+
+         findOnMap(street + ' ' + street_number + ' ' + city)
      }
 
      var $currentImg = null;
@@ -101,16 +168,72 @@
              .attr('src', URL.createObjectURL(e.target.files[0]));
      }
 
-     function deletePhoto() {
-
+     function deletePhoto($deleteImg, index) {
+         var $imgToClean = $deleteImg.parent().find('.spot-photo');
+         $imgToClean
+             .removeAttr('data-loaded')
+             .attr('src', '@Helper.NoPhotoImgPath');
+         jQuery('input[type=file][id="Image' + (index + 1) + '"]').val('');
      }
 
-     jQuery(document).ready(function () {         
-         initMap();
+     function createHoursSelector(selector, secondPickerSelector) {
+         var defDateFrom = new Date();
+         var defDateTo = new Date();
 
+         defDateFrom.setHours(8);
+         defDateFrom.setMinutes(0);
+
+         defDateTo.setHours(16);
+         defDateTo.setMinutes(0);
+
+         jQuery(selector).datetimepicker({
+             format: 'HH:mm',
+             defaultDate: defDateFrom,
+             ignoreReadonly: true,
+             icons: {
+                 up: 'fa fa-angle-up',
+                 down: 'fa fa-angle-down'
+             }
+         });
+
+         jQuery(secondPickerSelector).datetimepicker({
+             format: 'HH:mm',
+             defaultDate: defDateTo,
+             useCurrent: false,
+             ignoreReadonly: true,
+             icons: {
+                 up: 'fa fa-angle-up',
+                 down: 'fa fa-angle-down'
+             }
+         });
+
+         jQuery(selector).on("dp.change", function (e) {
+             jQuery(secondPickerSelector).data("DateTimePicker").minDate(e.date);
+         });
+         jQuery(secondPickerSelector).on("dp.change", function (e) {
+             jQuery(selector).data("DateTimePicker").maxDate(e.date);
+         });
+     }
+
+     function createCurrencyTouchSpin(selector) {
+         jQuery(selector).TouchSpin({
+             min: 0.00,
+             max: 999999999.00,
+             step: 0.01,
+             decimals: 2,
+             postfix: 'zł'
+         });
+     }
+
+     jQuery(document).ready(function () {
+         jQuery('#form-create-spot').validate().settings.ignore = '.ignore';
          jQuery('.spot-image-upload').on('change', setUploadedPhoto);
          jQuery('#btnAddPhoto').on('click', openUploader);
-         jQuery('#btnFindOnMap').on('click', findOnMap);
+         jQuery('.spot-photo-delete').each(function (index) {
+             jQuery(this).on('click', function () {
+                 deletePhoto(jQuery(this), index);
+             });
+         });
          jQuery('#txtSpotAddress').keyup(function (event) {
              if (event.keyCode == 13) {
                  findOnMap();
@@ -120,11 +243,27 @@
          jQuery(document).on('keypress', 'form', function (e) {
              return e.keyCode != 13;
          });
+
+         jQuery('.nav-pills a').eq(1).on('shown.bs.tab', function () {
+             google.maps.event.trigger(map, 'resize');
+         });
+         
+         createHoursSelector('#divOpeningHours_MondayFrom', '#divOpeningHours_MondayTo');
+         createHoursSelector('#divOpeningHours_TuesdayFrom', '#divOpeningHours_TuesdayTo');
+         createHoursSelector('#divOpeningHours_WednesdayFrom', '#divOpeningHours_WednesdayTo');
+         createHoursSelector('#divOpeningHours_ThursdayFrom', '#divOpeningHours_ThursdayTo');
+         createHoursSelector('#divOpeningHours_FridayFrom', '#divOpeningHours_FridayTo');
+         createHoursSelector('#divOpeningHours_SaturdayFrom', '#divOpeningHours_SaturdayTo');
+         createHoursSelector('#divOpeningHours_SundayFrom', '#divOpeningHours_SundayTo');
+
+         createCurrencyTouchSpin('#txtTicketAdultPrice');
+         createCurrencyTouchSpin('#txtTicketStudentPrice');
+         createCurrencyTouchSpin('#txtTicketKidsPrice');
      });
 </script>
 }
 
-@using (Html.BeginForm("Create", "Spot", FormMethod.Post, new { @enctype = "multipart/form-data" }))
+@using (Html.BeginForm("Create", "Spot", FormMethod.Post, new { @id = "form-create-spot", @enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
     @Html.TextBoxFor(x => x.Image1, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
@@ -133,98 +272,355 @@
     @Html.TextBoxFor(x => x.Image4, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
     @Html.TextBoxFor(x => x.Image5, new { @type = "file", @class = "spot-image-upload", @style = "display: none;" })
 
-    <div class="row" style="padding-bottom: 20px;">
-        <div class="col-md-8">
-            <h2 style="font-family: 'Lato'; margin-top: 0;">
-                Nowa lokalizacja
-            </h2>        
-        </div>
-        <div class="col-md-4">
-            <i class="fa fa-map-marker fa-3x" style="float: right;"></i>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            @Html.LabelFor(x => x.Name)
-        </div>
-        <div class="col-md-10">
-            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
-            @Html.ValidationMessageFor(x => x.Name, "", new { @class = "error-msg" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            @Html.LabelFor(x => x.Description)
-        </div>
-        <div class="col-md-10">
-            @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @style = "resize: none; height: 100px;" })
-            @Html.ValidationMessageFor(x => x.Description, "", new { @class = "error-msg" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            @Html.LabelFor(x => x.Image1)
-        </div>
-        <div class="col-md-10">
-            <ul id="ul-spot-images">
-                <li>
-                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png"/>
-                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
-                </li>
-                <li>
-                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
-                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
-                </li>
-                <li>
-                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
-                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
-                </li>
-                <li>
-                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
-                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
-                </li>
-                <li>
-                    <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
-                    <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
-                </li>
-            </ul>
-            <a id="btnAddPhoto" class="btn btn-primary btn-md" style="margin-top: 54px;"><i class="fa fa-image"></i>&nbsp;Dodaj zdjęcie</a>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-10">
-            <div id="map" style="height: 400px; width: 100%;"></div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2"></div>
-        <div class="col-md-10">
-            <div class="input-group">
-                <input id="txtSpotAddress" type="text" class="form-control" placeholder="Adres miejsca">
-                <span class="input-group-btn">
-                    <button id="btnFindOnMap" class="btn btn-primary btn-secondary" type="button">
-                        <i class="fa fa-search"></i>&nbsp;Szukaj</button>
-                </span>
+    <ul class="nav nav-pills">
+        <li class="active"><a data-toggle="tab" href="#general">Dane podstawowe</a></li>        
+        <li><a data-toggle="tab" href="#localisation">Lokalizacja</a></li>
+        <li><a data-toggle="tab" href="#extra-info">Informacje dodatkowe</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="general" class="tab-pane fade in active">
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.Name)
+                </div>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.Name, "", new { @class = "error-msg" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.Description)
+                </div>
+                <div class="col-md-10">
+                    @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @style = "resize: none; height: 100px;" })
+                    @Html.ValidationMessageFor(x => x.Description, "", new { @class = "error-msg" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.Image1)
+                </div>
+                <div class="col-md-10">
+                    <ul id="ul-spot-images">
+                        <li>
+                            <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                            <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                        </li>
+                        <li>
+                            <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                            <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                        </li>
+                        <li>
+                            <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                            <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                        </li>
+                        <li>
+                            <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                            <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                        </li>
+                        <li>
+                            <img class="spot-photo-delete" src="~/Content/assets/img/x-icon.png" />
+                            <img class="spot-photo" src="~/Content/assets/img/no-photo.png" />
+                        </li>
+                    </ul>
+                    <a id="btnAddPhoto" class="btn btn-primary btn-md" style="margin-top: 54px;"><i class="fa fa-image"></i>&nbsp;Dodaj zdjęcie</a>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.SpotCategoryId)
+                </div>
+                <div class="col-md-10">
+                    <select name="@Html.NameFor(x => x.SpotCategoryId)" class="selectpicker">
+                        @{ 
+                            foreach(var category in listSpotCategoryModel)
+                            {
+                                string strIconPath = Helper.CheckIfFileExists(category.IconPath) ? category.IconPath : Helper.NoPhotoImgPath;
+                                <option data-content="<img style='width: 14px; height: 14px;' src='@strIconPath'/>&nbsp;@category.Name" value="@category.SpotCategoryId.ToString()"></option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>        
+
+        <div id="localisation" class="tab-pane fade in">
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <div id="map" style="height: 400px; width: 100%;"></div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    <input id="txtSpotAddress" type="text" class="form-control" placeholder="Adres miejsca">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.CoorX)
+                </div>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(x => x.CoorX, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.CoorX, "", new { @class = "error-msg" })
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2">
+                    @Html.LabelFor(x => x.CoorY)
+                </div>
+                <div class="col-md-10">
+                    @Html.TextBoxFor(x => x.CoorY, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(x => x.CoorY, "", new { @class = "error-msg" })
+                </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            @Html.LabelFor(x => x.CoorX)
-        </div>
-        <div class="col-md-10">
-            @Html.TextBoxFor(x => x.CoorX, new { @class = "form-control" })
-            @Html.ValidationMessageFor(x => x.CoorX, "", new { @class = "error-msg" })
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-2">
-            @Html.LabelFor(x => x.CoorY)
-        </div>
-        <div class="col-md-10">
-            @Html.TextBoxFor(x => x.CoorY, new { @class = "form-control" })
-            @Html.ValidationMessageFor(x => x.CoorY, "", new { @class = "error-msg" })
+        <div id="extra-info" class="tab-pane fade in">
+            <div class="panel-group" id="accordion">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#opening-hours">
+                                <i class="fa fa-clock-o"></i>&nbsp;Godziny otwarcia
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="opening-hours" class="panel-collapse collapse">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Poniedziałek:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_MondayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_MondayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_MondayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_MondayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_MondayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_MondayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Wtorek:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_TuesdayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_TuesdayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_TuesdayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_TuesdayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_TuesdayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_TuesdayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Środa:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_WednesdayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_WednesdayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_WednesdayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_WednesdayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_WednesdayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_WednesdayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Czwartek:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_ThursdayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_ThursdayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_ThursdayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_ThursdayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_ThursdayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_ThursdayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Piątek:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_FridayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_FridayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_FridayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_FridayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_FridayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_FridayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Sobota:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_SaturdayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_SaturdayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_SaturdayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_SaturdayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_SaturdayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_SaturdayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2" style="padding-top: 5px;">
+                                    Niedziela:
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_SundayFrom'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_SundayFrom, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_SundayFrom, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="form-group">
+                                        <div class='input-group date' id='divOpeningHours_SundayTo'>
+                                            @Html.TextBoxFor(x => x.OpeningHours_SundayTo, new { @class = "form-control", @readonly = "readonly" })
+                                            <span class="input-group-addon">
+                                                <span class="fa fa-clock-o"></span>
+                                            </span>
+                                        </div>
+                                        @Html.ValidationMessageFor(x => x.OpeningHours_SundayTo, "", new { @class = "error-msg" })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#ticket-price">
+                                <i class="fa fa-dollar"></i>&nbsp;Ceny biletów
+                            </a>
+                        </h4>
+                    </div>
+                    <div id="ticket-price" class="panel-collapse collapse" style="padding-left: 20px; padding-top: 10px;">
+                        <div class="row">
+                            <div class="col-md-2">
+                                @Html.DisplayNameFor(x => x.TicketAdultPrice)
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.TicketAdultPrice, new { @id = "txtTicketAdultPrice", @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.TicketAdultPrice, "", new { @class = "error-msg" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                @Html.DisplayNameFor(x => x.TicketStudentPrice)
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.TicketStudentPrice, new { @id = "txtTicketStudentPrice", @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.TicketStudentPrice, "", new { @class = "error-msg" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-2">
+                                @Html.DisplayNameFor(x => x.TicketKidsPrice)
+                            </div>
+                            <div class="col-md-2">
+                                @Html.TextBoxFor(x => x.TicketKidsPrice, new { @id = "txtTicketKidsPrice", @class = "form-control" })
+                                @Html.ValidationMessageFor(x => x.TicketKidsPrice, "", new { @class = "error-msg" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> 
         </div>
     </div>
     <div class="row">
