@@ -18,6 +18,7 @@ namespace EGuidebook.Areas.WebAPI.Models
         public string Image3Path { get; set; }
         public string Image4Path { get; set; }
         public string Image5Path { get; set; }
+        public int AverageGrade { get; set; }
 
         public SpotWebAPIModel(EGuidebook.Models.SpotModel objSpotModel)
         {
@@ -32,6 +33,15 @@ namespace EGuidebook.Areas.WebAPI.Models
             this.Image3Path = "" + objSpotModel.Image3Path;
             this.Image4Path = "" + objSpotModel.Image4Path;
             this.Image5Path = "" + objSpotModel.Image5Path;
+
+            if(objSpotModel.Grades != null && objSpotModel.Grades.Count > 0)
+            {
+                this.AverageGrade = (int) Math.Ceiling(objSpotModel.Grades.Average(x => x.Grade));
+            }
+            else
+            {
+                this.AverageGrade = 0;
+            }
         }
     }
 }

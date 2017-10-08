@@ -34,7 +34,7 @@ namespace EGuidebook.Areas.WebAPI
             }
             catch(Exception ex)
             {
-                return new GetAllResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SEVER_ERROR);
+                return new GetAllResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
             }
         }
     }

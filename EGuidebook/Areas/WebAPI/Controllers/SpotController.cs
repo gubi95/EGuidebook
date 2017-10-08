@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Web.Http;
 using EGuidebook.Models;
 using EGuidebook.Areas.WebAPI.Models;
+using System.Data.Entity;
 
 namespace EGuidebook.Areas.WebAPI.Controllers
 {
@@ -30,7 +31,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
 
                 var listSpot = objApplicationDbContext
-                                .Spots
+                                .Spots                                
                                 .AsQueryable();
 
                 if (!string.IsNullOrEmpty(CategoryID))
@@ -46,10 +47,14 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
                 //}
 
-                return new GetByResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpot.ToList().Select(x => new SpotWebAPIModel(x)).ToList());
+                List<SpotModel> listSpotModel = listSpot
+                                                .Include(x => x.Grades)
+                                                .ToList();
+
+                return new GetByResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpotModel.Select(x => new SpotWebAPIModel(x)).ToList());
             }
             catch(Exception ex) { }
-            return new GetByResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SEVER_ERROR, new List<SpotWebAPIModel>());
+            return new GetByResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, new List<SpotWebAPIModel>());
         }
     }
 }

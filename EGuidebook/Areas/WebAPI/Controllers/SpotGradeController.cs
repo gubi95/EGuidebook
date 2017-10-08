@@ -82,7 +82,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
             }
             catch (Exception ex)
             {
-                return new CreateResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SEVER_ERROR);
+                return new CreateResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
             }
         }
     }
