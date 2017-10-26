@@ -29,12 +29,13 @@
                             <td>@objSpotViewModel.Description</td>
                             <td>X:@objSpotViewModel.CoorX<br/>Y:@objSpotViewModel.CoorY</td>
                             <td>
-                                <input type="checkbox" @(objSpotViewModel.IsApproved ? "checked=\"checked\"" : "") disabled />
+                                @(objSpotViewModel.IsApproved ? "Tak" : "Nie")
                                 @{ 
                                     if(objSpotViewModel.ApprovedBy != null && objSpotViewModel.ApprovalDate.HasValue)
                                     {
-                                        <img style="height: 24px; width: 24px;" src="@(Helper.CheckIfFileExists(objSpotViewModel.ApprovedBy.AvatarImagePath) ? objSpotViewModel.ApprovedBy.AvatarImagePath : Helper.NoPhotoImgPath)" />
-                                        @("nbsp;" + objSpotViewModel.ApprovedBy.FirstName + " " + objSpotViewModel.ApprovedBy.LastName) 
+                                        <br/>
+                                        <img style="margin-right: 2px; height: 24px; width: 24px;" src="@(Helper.CheckIfFileExists(objSpotViewModel.ApprovedBy.AvatarImagePath) ? objSpotViewModel.ApprovedBy.AvatarImagePath : Helper.NoPhotoImgPath)" />
+                                        @(objSpotViewModel.ApprovedBy.FirstName + " " + objSpotViewModel.ApprovedBy.LastName) 
                                         <br/>@objSpotViewModel.ApprovalDate.Value.ToString(new System.Globalization.CultureInfo("pl-PL"))
                                     }
                                 }
@@ -53,7 +54,7 @@
                     <th>Nazwa</th>
                     <th>Opis</th>
                     <th>Współrzędne</th>
-                    <th data-no-filter="true">Zatwierdzono</th>   
+                    <th>Zatwierdzono</th>   
                     <th data-no-filter="true"></th>
                 </tr>
             </tfoot>

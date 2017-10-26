@@ -18,9 +18,31 @@ namespace EGuidebook.Areas.WebAPI.Models
         public string Image3Path { get; set; }
         public string Image4Path { get; set; }
         public string Image5Path { get; set; }
-        public int AverageGrade { get; set; }
 
-        public SpotWebAPIModel(EGuidebook.Models.SpotModel objSpotModel)
+        public int AverageGrade { get; set; }
+        public int UserGrade { get; set; }
+
+        public bool IsOpeningHoursDefined { get; set; }
+        public string OpeningHours_MondayFrom { get; set; }
+        public string OpeningHours_MondayTo { get; set; }
+        public string OpeningHours_TuesdayFrom { get; set; }
+        public string OpeningHours_TuesdayTo { get; set; }
+        public string OpeningHours_WednesdayFrom { get; set; }
+        public string OpeningHours_WednesdayTo { get; set; }
+        public string OpeningHours_ThursdayFrom { get; set; }
+        public string OpeningHours_ThursdayTo { get; set; }
+        public string OpeningHours_FridayFrom { get; set; }
+        public string OpeningHours_FridayTo { get; set; }
+        public string OpeningHours_SaturdayFrom { get; set; }
+        public string OpeningHours_SaturdayTo { get; set; }
+        public string OpeningHours_SundayFrom { get; set; }
+        public string OpeningHours_SundayTo { get; set; }
+
+        public decimal TicketKidsPrice { get; set; }
+        public decimal TicketStudentPrice { get; set; }
+        public decimal TicketAdultPrice { get; set; }
+
+        public SpotWebAPIModel(EGuidebook.Models.SpotModel objSpotModel, EGuidebook.Models.SpotGradeModel objSpotGradeModel)
         {
             this.SpotID = objSpotModel.SpotID.ToString();
             this.SpotCategoryID = objSpotModel.SpotCategoryID.ToString();
@@ -42,6 +64,42 @@ namespace EGuidebook.Areas.WebAPI.Models
             {
                 this.AverageGrade = 0;
             }
+
+            if(
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_MondayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_MondayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_TuesdayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_TuesdayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_WednesdayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_WednesdayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_ThursdayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_ThursdayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_FridayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_FridayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_SaturdayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_SaturdayTo) &&
+                !string.IsNullOrEmpty(objSpotModel.OpeningHours_SundayFrom) && !string.IsNullOrEmpty(objSpotModel.OpeningHours_SundayTo))
+            {
+                this.IsOpeningHoursDefined = true;
+                this.OpeningHours_MondayFrom = objSpotModel.OpeningHours_MondayFrom;
+                this.OpeningHours_MondayTo = objSpotModel.OpeningHours_MondayTo;
+                this.OpeningHours_TuesdayFrom = objSpotModel.OpeningHours_TuesdayFrom;
+                this.OpeningHours_TuesdayTo = objSpotModel.OpeningHours_TuesdayTo;
+                this.OpeningHours_WednesdayFrom = objSpotModel.OpeningHours_WednesdayFrom;
+                this.OpeningHours_WednesdayTo = objSpotModel.OpeningHours_WednesdayTo;
+                this.OpeningHours_ThursdayFrom = objSpotModel.OpeningHours_ThursdayFrom;
+                this.OpeningHours_ThursdayTo = objSpotModel.OpeningHours_ThursdayTo;
+                this.OpeningHours_FridayFrom = objSpotModel.OpeningHours_FridayFrom;
+                this.OpeningHours_FridayTo = objSpotModel.OpeningHours_FridayTo;
+                this.OpeningHours_SaturdayFrom = objSpotModel.OpeningHours_SaturdayFrom;
+                this.OpeningHours_SaturdayTo = objSpotModel.OpeningHours_SaturdayTo;
+                this.OpeningHours_SundayFrom = objSpotModel.OpeningHours_SundayFrom;
+                this.OpeningHours_SundayTo = objSpotModel.OpeningHours_SundayTo;
+            }
+            else
+            {
+                this.IsOpeningHoursDefined = false;
+            }
+
+            this.UserGrade = objSpotGradeModel != null ? objSpotGradeModel.Grade : -1;
+
+            this.TicketKidsPrice = objSpotModel.TicketKidsPrice;
+            this.TicketStudentPrice = objSpotModel.TicketStudentPrice;
+            this.TicketAdultPrice = objSpotModel.TicketAdultPrice;
         }
     }
 }

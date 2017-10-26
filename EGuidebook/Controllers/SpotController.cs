@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using EGuidebook.Models;
 using System.Data.Entity;
+using System.Data.Entity;
 
 namespace EGuidebook.Controllers
 {
@@ -89,6 +90,30 @@ namespace EGuidebook.Controllers
             }
 
             return View(objSpotViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Approve(SpotViewModel objSpotViewModel)
+        {
+            ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+            SpotModel objSpotModel = objApplicationDbContext
+                                        .Spots
+                                        .FirstOrDefault(x => x.SpotID.Equals(objSpotViewModel.SpotID));
+
+            if(objSpotModel != null)
+            {
+                ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.User.Identity.Name));
+
+                objSpotModel.IsApproved = true;
+                objSpotModel.ApprovalDate = DateTime.Now;
+                objSpotModel.ApprovedByUserID = objApplicationUser.Id;
+                objApplicationDbContext.SaveChanges();
+            }
+
+            return RedirectToAction("Edit", new { @id = objSpotModel.SpotID.ToString() });
         }
     }
 }

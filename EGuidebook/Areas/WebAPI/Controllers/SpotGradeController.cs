@@ -12,11 +12,6 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 {    
     public class SpotGradeController : ApiController
     {
-        public class CreateResponse : WebAPIResponse
-        {
-            public CreateResponse(bool bSuccess, WebAPIResponse.EnumWebAPIResponseCode Code) : base(bSuccess, Code) { }
-        }
-
         public class CreateRequestData
         {
             public Guid SpotID { get; set; }
@@ -26,7 +21,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
         [HttpPost]
         [WebAPIBasicAuth]
-        public CreateResponse Create(CreateRequestData objCreateRequestData)
+        public WebAPIResponse Create(CreateRequestData objCreateRequestData)
         {
             try
             {
@@ -68,21 +63,21 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                         }
 
                         objApplicationDbContext.SaveChanges();
-                        return new CreateResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK);
+                        return new WebAPIResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK);
                     }
                     else
                     {
-                        return new CreateResponse(false, WebAPIResponse.EnumWebAPIResponseCode.SPOT_DOESNT_EXIST);
+                        return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.SPOT_DOESNT_EXIST);
                     }
                 }
                 else
                 {
-                    return new CreateResponse(false, WebAPIResponse.EnumWebAPIResponseCode.GRADE_INCORRECT_VALUE);
+                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.GRADE_INCORRECT_VALUE);
                 }
             }
             catch (Exception ex)
             {
-                return new CreateResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
+                return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
             }
         }
     }

@@ -12,15 +12,13 @@ namespace EGuidebook.Models
     {
         [Key]
         public Guid SpotID { get; set; }
-
-        [Required]
-        public Guid SpotCategoryID { get; set; }
+        
+        public Guid? SpotCategoryID { get; set; }
         [ForeignKey("SpotCategoryID")]
         public SpotCategoryModel SpotCategory { get; set; }
 
         [Required]
-        public string Name { get; set; }
-        [Required]        
+        public string Name { get; set; }         
         public string Description { get; set; }
         [Required]
         public string CoorX { get; set; }
@@ -35,7 +33,6 @@ namespace EGuidebook.Models
 
         public DateTime? ApprovalDate { get; set; }
 
-        [Required]
         public List<SpotGradeModel> Grades { get; set; }
 
         public string Image1Path { get; set; }

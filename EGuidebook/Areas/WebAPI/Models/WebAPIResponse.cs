@@ -17,7 +17,10 @@ namespace EGuidebook.Areas.WebAPI
 
             USER_ALREADY_EXISTS = 5,
             INCORRECT_USERNAME = 6,
-            INCORRECT_PASSWORD = 7
+            INCORRECT_PASSWORD = 7,
+
+            INCORRECT_SPOT_NAME = 8,
+            INCORRECT_SPOT_COORDINATES = 9,
         }
 
         public bool Success { get; set; }
