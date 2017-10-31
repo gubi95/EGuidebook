@@ -21,6 +21,10 @@ namespace EGuidebook.Areas.WebAPI
 
             INCORRECT_SPOT_NAME = 8,
             INCORRECT_SPOT_COORDINATES = 9,
+
+            INCORRECT_ROUTE_NAME = 10,
+            INCORRECT_ROUTE_SPOTS = 11,
+            INCORRECT_ROUTE_ID = 12
         }
 
         public bool Success { get; set; }

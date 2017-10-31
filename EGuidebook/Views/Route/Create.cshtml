@@ -11,6 +11,8 @@
 
 @section scripts {
     <script>
+        var arrSpots = JSON.parse('@Html.Raw(HttpUtility.JavaScriptStringEncode(JsonConvert.SerializeObject(Model.ApplicationSpots)))');
+
         jQuery(document).ready(function () {
             jQuery('#hf-spot-id-list').val('');
         });
@@ -26,8 +28,6 @@
             }
 
             var uluru = { lat: 51.9908627, lng: 19.4516549 };
-            var markers = JSON.parse('@Html.Raw(HttpUtility.JavaScriptStringEncode(JsonConvert.SerializeObject(Model.ApplicationSpots)))');
-
             geocoder = new google.maps.Geocoder();
             map = new google.maps.Map(divMap, {
                 zoom: 6,
@@ -36,8 +36,8 @@
 
             var infoWindow = new google.maps.InfoWindow();
 
-            for (i = 0; i < markers.length; i++) {
-                var position = new google.maps.LatLng(markers[i].CoorX, markers[i].CoorY);
+            for (i = 0; i < arrSpots.length; i++) {
+                var position = new google.maps.LatLng(arrSpots[i].CoorX, arrSpots[i].CoorY);
                 marker = new google.maps.Marker({
                     position: position,
                     map: map,
@@ -64,13 +64,13 @@
                         }
                         else {
                             infoWindowContent += '<br/><br/><a class="btn btn-primary btn-sm" data-is-in-list="false" onclick="toogleSpotInList(this, \'' + spot_id + '\')"><i class="fa fa-plus"></i>&nbsp;Dodaj</a>'
-                        }                        
+                        }
 
                         infoWindowContent += '</div>';
                         infoWindow.setContent(infoWindowContent);
                         infoWindow.open(map, marker);
                     }
-                })(marker, markers[i].SpotID, markers[i].Name, markers[i].Description, markers[i].ImagePaths));
+                })(marker, arrSpots[i].SpotID, arrSpots[i].Name, arrSpots[i].Description, arrSpots[i].ImagePaths));
             }
         }
 
@@ -94,11 +94,26 @@
             }
         }
 
+        function getSpotByID(spotID) {
+            if (arrSpots == null) {
+                return null;
+            }
+
+            for (var i = 0; i < arrSpots.length; i++) {
+                if (arrSpots[i].SpotID == spotID) {
+                    return arrSpots[i];
+                }
+            }
+
+            return null;
+        }
+
         function addSpotToList(spotID) {
             var currentValue = jQuery('#hf-spot-id-list').val();
             var arrSpotIDs = currentValue.split(',').filter(Boolean);
             arrSpotIDs.push(spotID);
             jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
+            addSpotToGUIList(getSpotByID(spotID));
         }
 
         function removeSpotFromList(spotID) {
@@ -110,6 +125,7 @@
                 }
             }
             jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
+            removeSpotFromGUIList(spotID);
         }
 
         function isSpotInList(spotID) {
@@ -123,10 +139,51 @@
             return false;
         }
 
+        function repairSpotOrderNumbers() {            
+            jQuery('.spot-order-number').each(function (i) {
+                jQuery(this).html((++i) + '.');                
+            });
+        }
+
+        function addSpotToGUIList(spot) {
+            var orderNumber = jQuery('.row-selected-spot').length + 1;
+
+            var rowHtml =
+                '<div class="row row-selected-spot" data-spot-id="' + spot.SpotID + '">' +
+                    '<div class="col-md-8" style="padding-top: 4px; font-size: 16px;">' +
+                '<b><span class="spot-order-number">' + orderNumber + '.</span>&nbsp;' + spot.Name + '</b>' +
+                '</div>' +
+                '<div class="col-md-4">' +
+                '<a class="btn btn-danger btn-sm" style="float: right;" onclick="removeSpotFromList(\'' + spot.SpotID + '\')"><i class="fa fa-trash"></i>&nbsp;Usuń</a>' + 
+                '</div>' +
+                '</div>';
+
+            jQuery('#row-selected-spots').append(rowHtml);
+        }
+
+        function removeSpotFromGUIList(spotID) {            
+            jQuery('#row-selected-spots div[class*="row-selected-spot"][data-spot-id="' + spotID + '"]').remove();
+        }
+
     </script>
 
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&libraries=places&callback=initMap"></script>
 }
+
+<style>
+    .row-selected-spot {
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 10px;
+        max-width: 650px;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 5px;
+        border: 1px solid #CCCCCC;
+        margin-bottom: 5px;
+        margin-left: 10px;
+    }
+</style>
 
 @using (Html.BeginForm("Create", "Route", FormMethod.Post))
 {
@@ -149,6 +206,13 @@
             <div id="map" style="height: 500px; width: 100%;"></div>
         </div>
     </div>
+
+    <div class="row" id="row-selected-spots">
+        <div class="col-md-12">
+
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-md-12">
             <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
