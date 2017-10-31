@@ -1,0 +1,51 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@model List<RouteViewModel>
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Trasy";
+    ViewBag.IconClass = "fa fa-road";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.ROUTES;
+}
+
+<div class="row">
+    <div class="col-md-12">
+        <table id="table-categories" class="data-table table table-striped table-bordered" width="100%" cellspacing="0" style="border: 0;">
+            <thead>
+                <tr>
+                    <th style="width: 30%;">Nazwa</th>
+                    <th style="width: 60%;">Opis</th>
+                    <th style="width: 10%">Edycja</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    foreach (RouteViewModel objRouteViewModel in Model)
+                    {
+                        <tr>
+                            <td>@objRouteViewModel.Name</td>
+                            <td>@objRouteViewModel.Description</td>
+                            <td style="text-align: center;">
+                                <a href="/Route/Edit/@objRouteViewModel.RouteID.ToString()" class="btn btn-primary btn-xs">
+                                    <i class="fa fa-pencil"></i>&nbsp;Edycja
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th style="width: 30%;">Nazwa</th>
+                    <th style="width: 60%;">Opis</th>
+                    <th style="width: 10%">Edycja</th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<div class="row" style="padding-top: 10px;">
+    <div class="col-md-12">
+        <a class="btn btn-warning btn-md pull-right" href="/Route/Create"><i class="fa fa-plus"></i>&nbsp;Nowa trasa</a>
+    </div>
+</div>

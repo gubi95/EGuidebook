@@ -1,0 +1,157 @@
+﻿@using EGuidebook.Shared
+@using EGuidebook.Models
+@using Newtonsoft.Json
+@model RouteViewModel
+@{
+    Layout = Helper.AdminLayoutPath;
+    ViewBag.Title = "Nowa trasa";
+    ViewBag.IconClass = "fa fa-road";
+    ViewBag.MenuItem = Helper.EnumSelectedMenuItem.ROUTES;
+}
+
+@section scripts {
+    <script>
+        jQuery(document).ready(function () {
+            jQuery('#hf-spot-id-list').val('');
+        });
+
+        var map = null;
+        var geocoder = null;
+        function initMap(reloadAutocomplete) {
+            var divMap = document.getElementById('map');
+
+            if (divMap == null) {
+                setTimeout(initMap, 100);
+                return;
+            }
+
+            var uluru = { lat: 51.9908627, lng: 19.4516549 };
+            var markers = JSON.parse('@Html.Raw(HttpUtility.JavaScriptStringEncode(JsonConvert.SerializeObject(Model.ApplicationSpots)))');
+
+            geocoder = new google.maps.Geocoder();
+            map = new google.maps.Map(divMap, {
+                zoom: 6,
+                center: uluru
+            });
+
+            var infoWindow = new google.maps.InfoWindow();
+
+            for (i = 0; i < markers.length; i++) {
+                var position = new google.maps.LatLng(markers[i].CoorX, markers[i].CoorY);
+                marker = new google.maps.Marker({
+                    position: position,
+                    map: map,
+                    icon: '/Content/assets/img/map-pin.png'
+                });
+
+                google.maps.event.addListener(marker, 'click', (function (marker, spot_id, spot_name, spot_description, arr_image_paths) {
+                    return function () {
+                        var infoWindowContent =
+                            '<div class="info_content">' +
+                            '<h3>' + spot_name + '</h3>' +
+                            '<p>' + spot_description + '</p>';
+
+                        for (var j = 0; j < arr_image_paths.length; j++) {
+                            if (arr_image_paths[j] == '') {
+                                break;
+                            }
+
+                            infoWindowContent += '<img src="' + arr_image_paths[j] + '" style="width: 40px; height: 40px; margin-right: 5px;" />';
+                        }
+
+                        if (isSpotInList(spot_id)) {
+                            infoWindowContent += '<br/><br/><a class="btn btn-danger btn-sm" data-is-in-list="true" onclick="toogleSpotInList(this, \'' + spot_id + '\')"><i class="fa fa-trash"></i>&nbsp;Usuń</a>'
+                        }
+                        else {
+                            infoWindowContent += '<br/><br/><a class="btn btn-primary btn-sm" data-is-in-list="false" onclick="toogleSpotInList(this, \'' + spot_id + '\')"><i class="fa fa-plus"></i>&nbsp;Dodaj</a>'
+                        }                        
+
+                        infoWindowContent += '</div>';
+                        infoWindow.setContent(infoWindowContent);
+                        infoWindow.open(map, marker);
+                    }
+                })(marker, markers[i].SpotID, markers[i].Name, markers[i].Description, markers[i].ImagePaths));
+            }
+        }
+
+        function toogleSpotInList(button, spotID) {
+            var $button = jQuery(button);
+            var isInList = $button.attr('data-is-in-list') == 'true';
+
+            if (isInList) {
+                removeSpotFromList(spotID);
+                $button
+                    .attr('class', 'btn btn-primary btn-sm')
+                    .attr('data-is-in-list', 'false')
+                    .html('<i class="fa fa-plus"></i>&nbsp;Dodaj');
+            }
+            else {
+                addSpotToList(spotID);
+                $button
+                    .attr('class', 'btn btn-danger btn-sm')
+                    .attr('data-is-in-list', 'true')
+                    .html('<i class="fa fa-trash"></i>&nbsp;Usuń');
+            }
+        }
+
+        function addSpotToList(spotID) {
+            var currentValue = jQuery('#hf-spot-id-list').val();
+            var arrSpotIDs = currentValue.split(',').filter(Boolean);
+            arrSpotIDs.push(spotID);
+            jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
+        }
+
+        function removeSpotFromList(spotID) {
+            var currentValue = jQuery('#hf-spot-id-list').val();
+            var arrSpotIDs = currentValue.split(',').filter(Boolean);
+            for (var i = 0; i < arrSpotIDs.length; i++) {
+                if (arrSpotIDs[i] == spotID) {
+                    arrSpotIDs.splice(i, 1);
+                }
+            }
+            jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
+        }
+
+        function isSpotInList(spotID) {
+            var currentValue = jQuery('#hf-spot-id-list').val();
+            var arrSpotIDs = currentValue.split(',').filter(Boolean);
+            for (var i = 0; i < arrSpotIDs.length; i++) {
+                if (arrSpotIDs[i] == spotID) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+    </script>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAMl-z3rt9slZ-qdrbfDYd7HXlCvxWq1TY&libraries=places&callback=initMap"></script>
+}
+
+@using (Html.BeginForm("Create", "Route", FormMethod.Post))
+{
+    @Html.HiddenFor(x => x.SpotsIDsListFormatted, new { @id = "hf-spot-id-list" })
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.Name)
+            @Html.TextBoxFor(x => x.Name, new { @class = "form-control" })
+            @Html.ValidationMessageFor(x => x.Name, "", new { @class = "error-msg" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div class="col-md-12">
+            @Html.LabelFor(x => x.Description)
+            @Html.TextAreaFor(x => x.Description, new { @class = "form-control", @style = "height: 200px; resize: none;" })
+        </div>
+    </div>
+    <div class="row" style="padding-bottom: 10px;">
+        <div style="width: 100%; padding: 10px;">
+            <div id="map" style="height: 500px; width: 100%;"></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
+        </div>
+    </div>
+}
