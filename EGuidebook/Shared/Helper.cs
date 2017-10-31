@@ -29,6 +29,7 @@ namespace EGuidebook.Shared
             DASHBOARD,
             USERS,
             SPOTS,
+            ROUTES,
             CATEGORIES,
             SETTINGS,
             ROLES

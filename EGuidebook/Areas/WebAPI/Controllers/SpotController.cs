@@ -134,8 +134,8 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                 CreationDate = DateTime.Now,
                                 Grade = objCreateSpotModelPostData.UserGrade,
                                 Message = null,
-                                SpotGradeID = objSpotModel.SpotID,
-                                User = objApplicationDbContext.Users.FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name))
+                                SpotGradeID = Guid.NewGuid(),
+                                User = objApplicationDbContext.Users.FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name))                                
                             };
 
                             objSpotModel.Grades = new List<SpotGradeModel>() { objSpotGradeModel };
@@ -143,6 +143,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
                         objApplicationDbContext.Spots.Add(objSpotModel);
                         objApplicationDbContext.SaveChanges();
+                        objApplicationDbContext.Database.CurrentTransaction.Commit();
                     }
                     catch(Exception ex)
                     {

@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using EGuidebook.Models;
 using System.Data.Entity;
-using System.Data.Entity;
 
 namespace EGuidebook.Controllers
 {

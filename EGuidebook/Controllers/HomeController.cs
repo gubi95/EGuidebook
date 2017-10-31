@@ -23,25 +23,11 @@ namespace EGuidebook.Controllers
 
             var spotCoordinates = objApplicationDbContext
                                     .Spots
-                                    .Select(x => new { x.CoorX, x.CoorY, x.Name, x.Description, x.Image1Path, x.Image2Path, x.Image3Path, x.Image4Path, x.Image5Path }).ToList();
+                                    .ToList();
 
             objHomeViewModel.SpotCoordinatesList = spotCoordinates
-                                                    .Select(x => new HomeViewModel.SpotCoordinates()
-                                                        {
-                                                            CoorX = double.Parse(x.CoorX, System.Globalization.CultureInfo.InvariantCulture),
-                                                            CoorY = double.Parse(x.CoorY, System.Globalization.CultureInfo.InvariantCulture),
-                                                            Name = x.Name,
-                                                            Description = x.Description,
-                                                            ImagePaths = new List<string>()
-                                                            {
-                                                                "" + x.Image1Path,
-                                                                "" + x.Image2Path,
-                                                                "" + x.Image3Path,
-                                                                "" + x.Image4Path,
-                                                                "" + x.Image5Path
-                                                            }
-                                                        }
-                                                    ).ToList();
+                                                    .Select(x => new HomeViewModel.SpotCoordinates(x))
+                                                    .ToList();
             return View(objHomeViewModel);
         }
     }

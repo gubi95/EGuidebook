@@ -219,6 +219,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
+    <Compile Include="Controllers\RouteController.cs" />
     <Compile Include="Controllers\SpotCategoryController.cs" />
     <Compile Include="Controllers\SpotController.cs" />
     <Compile Include="Controllers\SystemSettingsController.cs" />
@@ -290,6 +291,14 @@
     <Compile Include="Migrations\201710252218037_Spot_Description_Category_Not_Required.Designer.cs">
       <DependentUpon>201710252218037_Spot_Description_Category_Not_Required.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201710262042022_Route_CreatedByUserID.cs" />
+    <Compile Include="Migrations\201710262042022_Route_CreatedByUserID.Designer.cs">
+      <DependentUpon>201710262042022_Route_CreatedByUserID.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201710292340153_Spots_Routes_swap_column_names.cs" />
+    <Compile Include="Migrations\201710292340153_Spots_Routes_swap_column_names.Designer.cs">
+      <DependentUpon>201710292340153_Spots_Routes_swap_column_names.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\AlertBoxViewModel.cs" />
@@ -298,6 +307,7 @@
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\RoleViewModel.cs" />
     <Compile Include="Models\RouteModel.cs" />
+    <Compile Include="Models\RouteViewModel.cs" />
     <Compile Include="Models\SpotCategoryModel.cs" />
     <Compile Include="Models\SpotCategoryViewModel.cs" />
     <Compile Include="Models\SpotGradeModel.cs" />
@@ -786,6 +796,8 @@
     <Content Include="Views\User\Edit.cshtml" />
     <Content Include="Views\Spot\Index.cshtml" />
     <Content Include="Views\Spot\Edit.cshtml" />
+    <Content Include="Views\Route\Index.cshtml" />
+    <Content Include="Views\Route\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -890,6 +902,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710252218037_Spot_Description_Category_Not_Required.resx">
       <DependentUpon>201710252218037_Spot_Description_Category_Not_Required.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710262042022_Route_CreatedByUserID.resx">
+      <DependentUpon>201710262042022_Route_CreatedByUserID.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201710292340153_Spots_Routes_swap_column_names.resx">
+      <DependentUpon>201710292340153_Spots_Routes_swap_column_names.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

@@ -15,6 +15,10 @@ namespace EGuidebook.Models
 
         [Required]
         public string Name { get; set; }
+        
+        public string CreatedByUserID { get; set; }
+        [ForeignKey("CreatedByUserID")]
+        public ApplicationUser CreatedBy { get; set; }
 
         public string Description { get; set; }
         

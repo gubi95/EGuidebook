@@ -48,8 +48,8 @@ namespace EGuidebook.Models
             .WithMany(x => x.Routes)
             .Map(x =>
             {
-                x.MapLeftKey("SpotID");
-                x.MapRightKey("RouteID");
+                x.MapLeftKey("RouteID");
+                x.MapRightKey("SpotID");
                 x.ToTable("Spots_Routes");
             });
 
