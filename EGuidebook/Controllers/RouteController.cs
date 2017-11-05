@@ -31,7 +31,7 @@ namespace EGuidebook.Controllers
                                                     .Spots
                                                     .ToList();
 
-            return View(new RouteViewModel(new RouteModel(), listSpotModel));
+            return View(new RouteViewModel(new RouteModel(), listSpotModel, true));
         }
 
         [HttpPost]
@@ -61,6 +61,8 @@ namespace EGuidebook.Controllers
 
                 objApplicationDbContext.Routes.Add(objRouteModel);
                 objApplicationDbContext.SaveChanges();
+
+                return RedirectToAction("Edit", new { @id = objRouteModel.RouteID.ToString() });
             }
             return View(objRouteViewModel);
         }
@@ -68,13 +70,19 @@ namespace EGuidebook.Controllers
         [HttpGet]
         public ActionResult Edit(Guid id)
         {
-            RouteModel objRouteModel = new ApplicationDbContext()
-                                            .Routes
-                                            .First(x => x.RouteID.Equals(id));
+            ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+            RouteModel objRouteModel = objApplicationDbContext
+                                        .Routes
+                                        .Include(x => x.Spots)
+                                        .First(x => x.RouteID.Equals(id));
 
             if (objRouteModel != null)
             {
-                return View(new RouteViewModel(objRouteModel));
+                List<SpotModel> listSpotModel = objApplicationDbContext
+                                                .Spots
+                                                .ToList();
+
+                return View(new RouteViewModel(objRouteModel, listSpotModel, false));
             }
             else
             {
@@ -85,7 +93,57 @@ namespace EGuidebook.Controllers
         [HttpPost]
         public ActionResult Edit(Guid id, RouteViewModel objRouteViewModel)
         {
-            return null;
+            if(ModelState.IsValid)
+            {
+                ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+                RouteModel objRouteModel = objApplicationDbContext
+                                            .Routes
+                                            .Include(x => x.Spots)
+                                            .FirstOrDefault(x => x.RouteID.Equals(id));
+
+                if(objRouteModel == null)
+                {
+                    return RedirectToAction("Index");
+                }
+
+                string[] arrSelectedSpotIDs = objRouteViewModel.SpotsIDsListFormatted.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+
+                objRouteModel.Name = objRouteViewModel.Name;
+                objRouteModel.Description = objRouteViewModel.Description;
+                objRouteModel.Spots = objApplicationDbContext
+                                        .Spots
+                                        .Where(x => arrSelectedSpotIDs.Contains(x.SpotID.ToString()))
+                                        .ToList();
+
+
+
+                objApplicationDbContext.SaveChanges();
+
+                return RedirectToAction("Edit", new { @id = id.ToString() });
+            }
+
+            return View(objRouteViewModel);
+        }
+
+        [HttpPost]
+        public ActionResult Delete(Guid id)
+        {
+            try
+            {
+                ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+                RouteModel objRouteModel = objApplicationDbContext
+                                                    .Routes
+                                                    .Include(x => x.Spots)
+                                                    .FirstOrDefault(x => x.RouteID.Equals(id));
+
+                objApplicationDbContext.Routes.Remove(objRouteModel);
+                objApplicationDbContext.SaveChanges();
+            }
+            catch (Exception ex) { }
+
+            return RedirectToAction("Index");
         }
     }
 }

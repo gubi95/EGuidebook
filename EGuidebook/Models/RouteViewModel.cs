@@ -27,12 +27,21 @@ namespace EGuidebook.Models
             this.Description = objRouteModel.Description;            
         }
 
-        public RouteViewModel(RouteModel objRouteModel, List<SpotModel> listApplicationSpots)
+        public RouteViewModel(RouteModel objRouteModel, List<SpotModel> listApplicationSpots, bool bIsCreate)
         {
             this.RouteID = objRouteModel.RouteID;
             this.Name = objRouteModel.Name;
             this.Description = objRouteModel.Description;
             this.ApplicationSpots = listApplicationSpots != null ? listApplicationSpots.Select(x => new HomeViewModel.SpotCoordinates(x)).ToList() : new List<HomeViewModel.SpotCoordinates>();
+            
+            if(bIsCreate)
+            {
+                this.SpotsIDsListFormatted = "";
+            }
+            else
+            {
+                this.SpotsIDsListFormatted = string.Join(",", objRouteModel.Spots.Select(x => x.SpotID.ToString()));
+            }
         }
     }
 }

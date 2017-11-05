@@ -818,6 +818,7 @@
     <Content Include="Views\Spot\Edit.cshtml" />
     <Content Include="Views\Route\Index.cshtml" />
     <Content Include="Views\Route\Create.cshtml" />
+    <Content Include="Views\Route\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

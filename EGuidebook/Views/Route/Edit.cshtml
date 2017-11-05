@@ -4,7 +4,7 @@
 @model RouteViewModel
 @{
     Layout = Helper.AdminLayoutPath;
-    ViewBag.Title = "Nowa trasa";
+    ViewBag.Title = "Edycja trasy";
     ViewBag.IconClass = "fa fa-road";
     ViewBag.MenuItem = Helper.EnumSelectedMenuItem.ROUTES;
 }
@@ -82,6 +82,15 @@
                     }
                 })(marker, arrSpots[i].SpotID, arrSpots[i].Name, arrSpots[i].Description, arrSpots[i].ImagePaths));
             }
+
+            initSpotMap();
+        }
+
+        function initSpotMap() {
+            var spotIDs = '@("" + Model.SpotsIDsListFormatted)'.split(',').filter(Boolean);
+            for (var i = 0; i < spotIDs.length; i++) {
+                addSpotToList(spotIDs[i]);
+            }
         }
 
         function toogleSpotInList(button, spotID) {
@@ -152,9 +161,9 @@
             return false;
         }
 
-        function repairSpotOrderList() {            
+        function repairSpotOrderList() {
             jQuery('.spot-order-number').each(function (i) {
-                jQuery(this).html((++i) + '.');                
+                jQuery(this).html((++i) + '.');
             });
             jQuery('#spots-sortable').sortable('refresh');
         }
@@ -176,24 +185,24 @@
                 '<b><span class="spot-order-number">' + orderNumber + '.</span>&nbsp;' + spot.Name + '</b>' +
                 '</div>' +
                 '<div class="col-md-4">' +
-                '<a class="btn btn-danger btn-sm" style="float: right;" onclick="removeSpotFromList(\'' + spot.SpotID + '\')"><i class="fa fa-trash"></i>&nbsp;Usuń</a>' + 
+                '<a class="btn btn-danger btn-sm" style="float: right;" onclick="removeSpotFromList(\'' + spot.SpotID + '\')"><i class="fa fa-trash"></i>&nbsp;Usuń</a>' +
                 '</div></div>' +
                 '</li>';
 
             jQuery('#spots-sortable').append(rowHtml);
 
-            repairSpotOrderList();            
+            repairSpotOrderList();
         }
 
-        function removeSpotFromGUIList(spotID) {            
+        function removeSpotFromGUIList(spotID) {
             jQuery('#spots-sortable li[data-spot-id="' + spotID + '"]').remove();
-            repairSpotOrderList();            
+            repairSpotOrderList();
         }
 
         function buildRoutePath() {
             var path = [];
             var currentValue = jQuery('#hf-spot-id-list').val();
-            var arrSpotIDs = currentValue.split(',').filter(Boolean);            
+            var arrSpotIDs = currentValue.split(',').filter(Boolean);
             for (var i = 0; i < arrSpotIDs.length; i++) {
                 var spot = getSpotByID(arrSpotIDs[i]);
                 if (spot != null) {
@@ -252,7 +261,7 @@
     }
 </style>
 
-@using (Html.BeginForm("Create", "Route", FormMethod.Post))
+@using (Html.BeginForm("Edit", "Route", FormMethod.Post))
 {
     @Html.HiddenFor(x => x.SpotsIDsListFormatted, new { @id = "hf-spot-id-list" })
     <div class="row" style="padding-bottom: 10px;">
@@ -278,14 +287,15 @@
             <h3>
                 <i class="fa fa-sort"></i>&nbsp;Obecna trasa<span id="span-current-route-distance"></span>
             </h3>
-            <ul id="spots-sortable" style="padding-left: 0; list-style-type: none;">
-
-            </ul>
+            <ul id="spots-sortable" style="padding-left: 0; list-style-type: none;"></ul>
         </div>
     </div>
     <div class="row">
         <div class="col-md-12">
+            <button type="button" class="btn btn-danger btn-md pull-left" onclick="jQuery('#form-delete-route').submit()"><i class="fa fa-trash"></i>&nbsp;Usuń</button>
             <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
         </div>
     </div>
 }
+
+@using (Html.BeginForm("Delete/" + Url.RequestContext.RouteData.Values["id"], "Route", FormMethod.Post, new { @id = "form-delete-route" })) { }

@@ -644,7 +644,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">    
+        <div class="col-md-12">   
+            @*<a class="btn btn-danger btn-md pull-left" onclick="jQuery('#form-delete-spot').submit()" style="margin-right: 10px;"><i class="fa fa-trash"></i>&nbsp;Usuń</a>*@
             <button type="submit" class="btn btn-warning btn-md pull-right" style="min-width: 80px;">
                 <i class="fa fa-plus"></i>&nbsp;Zapisz
             </button>
@@ -665,3 +666,5 @@
     @Html.AntiForgeryToken()
     @Html.HiddenFor(x => x.SpotID)
 }
+
+@*@using (Html.BeginForm("Delete/" + Url.RequestContext.RouteData.Values["id"], "Spot", FormMethod.Post, new { @id = "form-delete-spot" }))*@
