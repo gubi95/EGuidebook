@@ -17,6 +17,7 @@ namespace EGuidebook
             bundles.Add(new ScriptBundle("~/bundles/jQueryDataTables").Include("~/Content/assets/js/jQuery-DataTable-1.10.15/DataTable.min.js"));
             bundles.Add(new ScriptBundle("~/bundles/touchspin").Include("~/Content/assets/js/bootstrap-touchspin-master/dist/jquery.bootstrap-touchspin.min.js"));
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").Include("~/Content/assets/bootstrap/js/bootstrap.js", "~/Scripts/respond.js"));
+            bundles.Add(new ScriptBundle("~/bundles/jquery-ui").Include("~/Content/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.js"));
             bundles.Add(new ScriptBundle("~/bundles/scripts").Include("~/Content/assets/js/scripts.js"));
             bundles.Add(new StyleBundle("~/Content/css")
                 .Include(
@@ -27,7 +28,8 @@ namespace EGuidebook
                 "~/Content/assets/js/jQuery-DataTable-1.10.15/styles.css",
                 "~/Content/assets/js/bootstrap-select-1.12.4/dist/css/bootstrap-select.min.css",
                 "~/Content/assets/bootstrap-datetimepicker/bootstrap-datetimepicker.min.css",
-                "~/Content/assets/js/bootstrap-touchspin-master/dist/jquery.bootstrap-touchspin.min.css"
+                "~/Content/assets/js/bootstrap-touchspin-master/dist/jquery.bootstrap-touchspin.min.css",
+                "~/Content/assets/js/jQuery/jquery-ui-1.12.1/jquery-ui.min.css"
             ));
         }
     }

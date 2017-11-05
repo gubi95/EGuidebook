@@ -15,10 +15,19 @@
 
         jQuery(document).ready(function () {
             jQuery('#hf-spot-id-list').val('');
+            jQuery("#spots-sortable").sortable({
+                stop: function () {
+                    repairSpotOrderList();
+                    buildSpotsListFormatted();
+                }
+            });
+            jQuery("#spots-sortable").disableSelection();
         });
 
         var map = null;
         var geocoder = null;
+        var infoWindow = null;
+
         function initMap(reloadAutocomplete) {
             var divMap = document.getElementById('map');
 
@@ -34,7 +43,7 @@
                 center: uluru
             });
 
-            var infoWindow = new google.maps.InfoWindow();
+            infoWindow = new google.maps.InfoWindow();
 
             for (i = 0; i < arrSpots.length; i++) {
                 var position = new google.maps.LatLng(arrSpots[i].CoorX, arrSpots[i].CoorY);
@@ -109,23 +118,24 @@
         }
 
         function addSpotToList(spotID) {
-            var currentValue = jQuery('#hf-spot-id-list').val();
-            var arrSpotIDs = currentValue.split(',').filter(Boolean);
-            arrSpotIDs.push(spotID);
-            jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
             addSpotToGUIList(getSpotByID(spotID));
+            buildSpotsListFormatted();
+            closeInfoWindow();
         }
 
         function removeSpotFromList(spotID) {
-            var currentValue = jQuery('#hf-spot-id-list').val();
-            var arrSpotIDs = currentValue.split(',').filter(Boolean);
-            for (var i = 0; i < arrSpotIDs.length; i++) {
-                if (arrSpotIDs[i] == spotID) {
-                    arrSpotIDs.splice(i, 1);
-                }
-            }
-            jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
             removeSpotFromGUIList(spotID);
+            buildSpotsListFormatted();
+            closeInfoWindow();
+        }
+
+        function closeInfoWindow() {
+            if (infoWindow != null) {
+                try {
+                    infoWindow.close();
+                }
+                catch (exc) { }
+            }
         }
 
         function isSpotInList(spotID) {
@@ -139,30 +149,42 @@
             return false;
         }
 
-        function repairSpotOrderNumbers() {            
+        function repairSpotOrderList() {            
             jQuery('.spot-order-number').each(function (i) {
                 jQuery(this).html((++i) + '.');                
             });
+            jQuery('#spots-sortable').sortable('refresh');
+        }
+
+        function buildSpotsListFormatted() {
+            var arrSpotIDs = [];
+            jQuery('#spots-sortable li').each(function () {
+                arrSpotIDs.push(jQuery(this).attr('data-spot-id'));
+            });
+            jQuery('#hf-spot-id-list').val(arrSpotIDs.join(','));
         }
 
         function addSpotToGUIList(spot) {
             var orderNumber = jQuery('.row-selected-spot').length + 1;
 
             var rowHtml =
-                '<div class="row row-selected-spot" data-spot-id="' + spot.SpotID + '">' +
-                    '<div class="col-md-8" style="padding-top: 4px; font-size: 16px;">' +
+                '<li class="li-selected-spot" data-spot-id="' + spot.SpotID + '">' +
+                    '<div class="row row-selected-spot"><div class="col-md-8" style="padding-top: 4px; font-size: 16px;">' +
                 '<b><span class="spot-order-number">' + orderNumber + '.</span>&nbsp;' + spot.Name + '</b>' +
                 '</div>' +
                 '<div class="col-md-4">' +
                 '<a class="btn btn-danger btn-sm" style="float: right;" onclick="removeSpotFromList(\'' + spot.SpotID + '\')"><i class="fa fa-trash"></i>&nbsp;Usuń</a>' + 
-                '</div>' +
-                '</div>';
+                '</div></div>' +
+                '</li>';
 
-            jQuery('#row-selected-spots').append(rowHtml);
+            jQuery('#spots-sortable').append(rowHtml);
+
+            repairSpotOrderList();
         }
 
         function removeSpotFromGUIList(spotID) {            
-            jQuery('#row-selected-spots div[class*="row-selected-spot"][data-spot-id="' + spotID + '"]').remove();
+            jQuery('#spots-sortable li[data-spot-id="' + spotID + '"]').remove();
+            repairSpotOrderList();
         }
 
     </script>
@@ -182,6 +204,7 @@
         border: 1px solid #CCCCCC;
         margin-bottom: 5px;
         margin-left: 10px;
+        cursor: pointer;
     }
 </style>
 
@@ -206,13 +229,16 @@
             <div id="map" style="height: 500px; width: 100%;"></div>
         </div>
     </div>
-
-    <div class="row" id="row-selected-spots">
+    <div class="row">
         <div class="col-md-12">
+            <h3>
+                <i class="fa fa-sort"></i>&nbsp;Obecna trasa
+            </h3>
+            <ul id="spots-sortable" style="padding-left: 0; list-style-type: none;">
 
+            </ul>
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-12">
             <button type="submit" class="btn btn-warning btn-md pull-right"><i class="fa fa-check"></i>&nbsp;Zapisz</button>
