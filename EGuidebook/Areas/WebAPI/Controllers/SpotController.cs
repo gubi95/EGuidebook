@@ -15,6 +15,49 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 {
     public class SpotController : ApiController
     {
+        public class GetForGoogleMapResponse : WebAPIResponse
+        {
+            public SpotForGoogleMap[] Spots { get; private set; }
+
+            public GetForGoogleMapResponse(bool bSuccess, EnumWebAPIResponseCode Code, SpotForGoogleMap[] arrSpotForGoogleMap) : base(bSuccess, Code)
+            {
+                this.Spots = arrSpotForGoogleMap;
+            }
+        }
+
+        public GetForGoogleMapResponse GetForGoogleMap()
+        {
+            try
+            {
+                SpotForGoogleMap[] arrSpotForGoogleMap = new ApplicationDbContext()
+                                                                .Spots
+                                                                .Where(x => x.IsApproved)
+                                                                .Select(x =>
+                                                                    new
+                                                                    {
+                                                                        x.SpotID,
+                                                                        x.Name,
+                                                                        x.CoorX,
+                                                                        x.CoorY
+                                                                    })
+                                                                .ToList()
+                                                                .Select(x =>
+                                                                    new SpotForGoogleMap(
+                                                                        x.SpotID.ToString(),
+                                                                        x.Name,
+                                                                        double.Parse(x.CoorX, System.Globalization.CultureInfo.InvariantCulture),
+                                                                        double.Parse(x.CoorY, System.Globalization.CultureInfo.InvariantCulture)
+                                                                    )
+                                                                 )
+                                                                 .ToArray();
+
+                return new GetForGoogleMapResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, arrSpotForGoogleMap);
+            }
+            catch (Exception ex) { }
+
+            return new GetForGoogleMapResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, new SpotForGoogleMap[] { });
+        }
+
         public class GetByResponse : WebAPIResponse
         {
             public List<SpotWebAPIModel> Spots { get; private set; }

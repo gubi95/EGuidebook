@@ -12,6 +12,76 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 {
     public class RouteController : ApiController
     {
+        public class Route
+        {
+            public string RouteID { get; private set; }
+            public string Name { get; private set; }
+            public string Description { get; private set; }
+            public bool IsSystemRoute { get; private set; }
+            public RouteSpot[] Spots { get; private set; }
+
+            public Route(RouteModel objRouteModel)
+            {
+                this.RouteID = objRouteModel.RouteID.ToString();
+                this.Name = objRouteModel.Name;
+                this.Description = objRouteModel.Description;
+                this.IsSystemRoute = objRouteModel.IsSystemRoute;
+                this.Spots = objRouteModel.Spots != null ? objRouteModel.Spots.Select(x => new RouteSpot(x)).ToArray() : new RouteSpot[] { };
+            }
+        }
+
+        public class RouteSpot
+        {
+            public string SpotID { get; private set; }
+            public string Name { get; private set; }
+            public double CoorX { get; private set; }
+            public double CoorY { get; private set; }
+
+            public RouteSpot(SpotModel objSpotModel)
+            {
+                this.SpotID = objSpotModel.SpotID.ToString();
+                this.Name = objSpotModel.Name;
+                this.CoorX = double.Parse(objSpotModel.CoorX, System.Globalization.CultureInfo.InvariantCulture);
+                this.CoorY = double.Parse(objSpotModel.CoorY, System.Globalization.CultureInfo.InvariantCulture); 
+            }
+        }
+
+        public class GetAllResponse : WebAPIResponse
+        {
+            public Route[] Routes { get; private set; }
+
+            public GetAllResponse(bool bSuccess, EnumWebAPIResponseCode Code, Route[] arrRoute) : base(bSuccess, Code)
+            {
+                this.Routes = arrRoute;
+            }
+        }
+
+        [HttpGet]
+        [WebAPIBasicAuth]
+        public GetAllResponse GetAll()
+        {
+            try
+            {
+                ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+                ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
+
+                List<Route> listRoute = objApplicationDbContext
+                                            .Routes
+                                            .Include(x => x.Spots)
+                                            .Where(x => x.CreatedByUserID.Equals(objApplicationUser.Id.ToString()) || x.IsSystemRoute)
+                                            .ToList()
+                                            .Select(x => new Route(x))
+                                            .ToList();
+
+                return new GetAllResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listRoute.ToArray());
+            }
+            catch (Exception ex) { }
+            return new GetAllResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, new Route[] { });
+        }
+
         public class CreateRoutePostData
         {
             public string Name { get; set; }
@@ -66,6 +136,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                             CreatedByUserID = objApplicationUser.Id,
                             Description = objCreateRoutePostData.Description,
                             Name = objCreateRoutePostData.Name,
+                            IsSystemRoute = false,
                             Spots = listSpotModel
                         };
 
@@ -144,6 +215,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
                         objRouteModel.Name = objEditRoutePostData.Name;
                         objRouteModel.Description = objEditRoutePostData.Description;
+                        objRouteModel.IsSystemRoute = false;
                         objRouteModel.Spots = listSpotModel;
                         
                         objApplicationDbContext.SaveChanges();

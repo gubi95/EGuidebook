@@ -213,6 +213,7 @@
     <Compile Include="Areas\WebAPI\Controllers\SpotGradeController.cs" />
     <Compile Include="Areas\WebAPI\Controllers\UserController.cs" />
     <Compile Include="Areas\WebAPI\Models\SpotCategoryWebAPIModel.cs" />
+    <Compile Include="Areas\WebAPI\Models\SpotForGoogleMap.cs" />
     <Compile Include="Areas\WebAPI\Models\SpotWebAPIModel.cs" />
     <Compile Include="Areas\WebAPI\Models\WebAPIResponse.cs" />
     <Compile Include="Areas\WebAPI\WebAPIAreaRegistration.cs" />
@@ -299,6 +300,10 @@
     <Compile Include="Migrations\201710292340153_Spots_Routes_swap_column_names.cs" />
     <Compile Include="Migrations\201710292340153_Spots_Routes_swap_column_names.Designer.cs">
       <DependentUpon>201710292340153_Spots_Routes_swap_column_names.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201711162125492_RouteModel_IsSystemRoute_Flag.cs" />
+    <Compile Include="Migrations\201711162125492_RouteModel_IsSystemRoute_Flag.Designer.cs">
+      <DependentUpon>201711162125492_RouteModel_IsSystemRoute_Flag.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -929,6 +934,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201710292340153_Spots_Routes_swap_column_names.resx">
       <DependentUpon>201710292340153_Spots_Routes_swap_column_names.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201711162125492_RouteModel_IsSystemRoute_Flag.resx">
+      <DependentUpon>201711162125492_RouteModel_IsSystemRoute_Flag.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

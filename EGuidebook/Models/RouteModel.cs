@@ -21,6 +21,8 @@ namespace EGuidebook.Models
         public ApplicationUser CreatedBy { get; set; }
 
         public string Description { get; set; }
+
+        public bool IsSystemRoute { get; set; }
         
         [ForeignKey("SpotID")]
         public List<SpotModel> Spots { get; set; }

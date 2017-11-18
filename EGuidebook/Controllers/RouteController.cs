@@ -52,6 +52,7 @@ namespace EGuidebook.Controllers
                     RouteID = Guid.NewGuid(),
                     Name = objRouteViewModel.Name,
                     Description = objRouteViewModel.Description,
+                    IsSystemRoute = objRouteViewModel.IsSystemRoute,
                     CreatedByUserID = objApplicationUser.Id,
                     Spots = objApplicationDbContext
                             .Spots
@@ -111,6 +112,7 @@ namespace EGuidebook.Controllers
 
                 objRouteModel.Name = objRouteViewModel.Name;
                 objRouteModel.Description = objRouteViewModel.Description;
+                objRouteModel.IsSystemRoute = objRouteViewModel.IsSystemRoute;
                 objRouteModel.Spots = objApplicationDbContext
                                         .Spots
                                         .Where(x => arrSelectedSpotIDs.Contains(x.SpotID.ToString()))

@@ -13,8 +13,10 @@ namespace EGuidebook.Models
         [Display(Name = "Nazwa")]
         public string Name { get; set; }
         [Display(Name = "Opis")]
-        public string Description { get; set; }        
-        
+        public string Description { get; set; }
+        [Display(Name = "Trasa systemowa")]
+        public bool IsSystemRoute { get; set; }
+
         public string SpotsIDsListFormatted { get; set; }
         public List<HomeViewModel.SpotCoordinates> ApplicationSpots { get; set; }
 
@@ -24,7 +26,8 @@ namespace EGuidebook.Models
         {
             this.RouteID = objRouteModel.RouteID;
             this.Name = objRouteModel.Name;
-            this.Description = objRouteModel.Description;            
+            this.Description = objRouteModel.Description;
+            this.IsSystemRoute = objRouteModel.IsSystemRoute;
         }
 
         public RouteViewModel(RouteModel objRouteModel, List<SpotModel> listApplicationSpots, bool bIsCreate)
@@ -32,6 +35,7 @@ namespace EGuidebook.Models
             this.RouteID = objRouteModel.RouteID;
             this.Name = objRouteModel.Name;
             this.Description = objRouteModel.Description;
+            this.IsSystemRoute = objRouteModel.IsSystemRoute;
             this.ApplicationSpots = listApplicationSpots != null ? listApplicationSpots.Select(x => new HomeViewModel.SpotCoordinates(x)).ToList() : new List<HomeViewModel.SpotCoordinates>();
             
             if(bIsCreate)
