@@ -88,26 +88,36 @@ namespace EGuidebook.Areas.WebAPI.Controllers
             public string Description { get; set; }
             public string[] SpotIDs { get; set; }
         }
+
+        public class CreateReponse : WebAPIResponse
+        {
+            public string RouteID { get; private set; }
+
+            public CreateReponse(bool bSuccess, EnumWebAPIResponseCode Code, string strRouteID = "") : base(bSuccess, Code)
+            {
+                this.RouteID = strRouteID;
+            }
+        }
                 
         [HttpPost]
         [WebAPIBasicAuth]
-        public WebAPIResponse Create(CreateRoutePostData objCreateRoutePostData)
+        public CreateReponse Create(CreateRoutePostData objCreateRoutePostData)
         {
             try
             {
                 if (objCreateRoutePostData == null)
                 {
-                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
+                    return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
                 }
 
                 if(string.IsNullOrEmpty(("" + objCreateRoutePostData.Name).Trim()))
                 {
-                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_NAME);
+                    return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_NAME);
                 }
 
                 if (objCreateRoutePostData.SpotIDs == null || objCreateRoutePostData.SpotIDs.Length < 2)
                 {
-                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
+                    return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
                 }
 
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
@@ -123,7 +133,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
                         if (listSpotModel.Count != objCreateRoutePostData.SpotIDs.Length)
                         {
-                            return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
+                            return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
                         }
 
                         ApplicationUser objApplicationUser = objApplicationDbContext
@@ -144,6 +154,8 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                         objApplicationDbContext.SaveChanges();
 
                         objDbContextTransaction.Commit();
+
+                        return new CreateReponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, objRouteModel.RouteID.ToString());
                     }
                     catch(Exception ex)
                     {
@@ -152,7 +164,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 }
             }
             catch (Exception ex) { }
-            return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
+            return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);
         }
 
         public class EditRoutePostData
