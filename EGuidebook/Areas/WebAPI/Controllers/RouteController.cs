@@ -77,6 +77,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 List<Route> listRoute = objApplicationDbContext
                                             .Routes
                                             .Include(x => x.Spots)
+                                            .Include("Spots.Spot")
                                             .Where(x => x.CreatedByUserID.Equals(objApplicationUser.Id.ToString()) || x.IsSystemRoute)
                                             .ToList()
                                             .Select(x => new Route(x))
@@ -284,13 +285,23 @@ namespace EGuidebook.Areas.WebAPI.Controllers
             try
             {
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
-                RouteModel objRouteModel = new RouteModel()
+
+                RouteModel objRouteModel = objApplicationDbContext
+                                            .Routes
+                                            .FirstOrDefault(x => x.RouteID.ToString().Equals(objDeletePostData.RouteID));
+
+                if(!objRouteModel.IsSystemRoute)
                 {
-                    RouteID = Guid.Parse(objDeletePostData.RouteID)
-                };
-                objApplicationDbContext.Routes.Attach(objRouteModel);
-                objApplicationDbContext.Routes.Remove(objRouteModel);
-                objApplicationDbContext.SaveChanges();
+                    ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
+
+                    if (objRouteModel.CreatedByUserID.Equals(objApplicationUser.Id))
+                    {
+                        objApplicationDbContext.Routes.Remove(objRouteModel);
+                        objApplicationDbContext.SaveChanges();
+                    }
+                }
 
                 return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.OK);
             }
