@@ -47,17 +47,25 @@ namespace EGuidebook.Controllers
 
                 string[] arrSelectedSpotIDs = objRouteViewModel.SpotsIDsListFormatted.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
+                List<SpotsRoutesModel> listSpotsRoutesModel = new List<SpotsRoutesModel>();
+
+                Guid objRouteID = Guid.NewGuid();
+
+                int i = 0;
+                foreach (string strSpotID in arrSelectedSpotIDs)
+                {
+                    listSpotsRoutesModel.Add(new SpotsRoutesModel() { Ordinal = i, RouteID = objRouteID, SpotID = Guid.Parse(strSpotID) });
+                    i++;
+                }
+
                 RouteModel objRouteModel = new RouteModel()
                 {
-                    RouteID = Guid.NewGuid(),
+                    RouteID = objRouteID,
                     Name = objRouteViewModel.Name,
                     Description = objRouteViewModel.Description,
                     IsSystemRoute = objRouteViewModel.IsSystemRoute,
                     CreatedByUserID = objApplicationUser.Id,
-                    Spots = objApplicationDbContext
-                            .Spots
-                            .Where(x => arrSelectedSpotIDs.Contains(x.SpotID.ToString()))
-                            .ToList()
+                    Spots = listSpotsRoutesModel
                 };
 
                 objApplicationDbContext.Routes.Add(objRouteModel);
@@ -110,15 +118,19 @@ namespace EGuidebook.Controllers
 
                 string[] arrSelectedSpotIDs = objRouteViewModel.SpotsIDsListFormatted.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
 
+                List<SpotsRoutesModel> listSpotsRoutesModel = new List<SpotsRoutesModel>();
+
+                int i = 0;
+                foreach (string strSpotID in arrSelectedSpotIDs)
+                {
+                    listSpotsRoutesModel.Add(new SpotsRoutesModel() { Ordinal = i, RouteID = objRouteModel.RouteID, SpotID = Guid.Parse(strSpotID) });
+                    i++;
+                }
+
                 objRouteModel.Name = objRouteViewModel.Name;
                 objRouteModel.Description = objRouteViewModel.Description;
                 objRouteModel.IsSystemRoute = objRouteViewModel.IsSystemRoute;
-                objRouteModel.Spots = objApplicationDbContext
-                                        .Spots
-                                        .Where(x => arrSelectedSpotIDs.Contains(x.SpotID.ToString()))
-                                        .ToList();
-
-
+                objRouteModel.Spots = listSpotsRoutesModel;
 
                 objApplicationDbContext.SaveChanges();
 

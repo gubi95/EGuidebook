@@ -59,8 +59,5 @@ namespace EGuidebook.Models
         public decimal TicketAdultPrice { get; set; }
         public decimal TicketStudentPrice { get; set; }
         public decimal TicketKidsPrice { get; set; }
-
-        [ForeignKey("RouteID")]
-        public List<RouteModel> Routes { get; set; }
     }
 }

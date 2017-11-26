@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using System.Data.Entity;
+using System.Text;
 
 namespace EGuidebook.Areas.WebAPI.Controllers
 {
@@ -26,7 +27,12 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 this.Name = objRouteModel.Name;
                 this.Description = objRouteModel.Description;
                 this.IsSystemRoute = objRouteModel.IsSystemRoute;
-                this.Spots = objRouteModel.Spots != null ? objRouteModel.Spots.Select(x => new RouteSpot(x)).ToArray() : new RouteSpot[] { };
+                this.Spots = objRouteModel.Spots != null ? objRouteModel
+                                                            .Spots
+                                                            .OrderBy(x => x.Ordinal)
+                                                            .Select(x => new RouteSpot(x.Spot))
+                                                            .ToArray() 
+                                                            : new RouteSpot[] { };
             }
         }
 
@@ -136,18 +142,34 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                             return new CreateReponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
                         }
 
+                        // sort to keep correct order
+                        listSpotModel = listSpotModel
+                                            .OrderBy(x => objCreateRoutePostData.SpotIDs.ToList().IndexOf(x.SpotID.ToString()))
+                                            .ToList();
+
                         ApplicationUser objApplicationUser = objApplicationDbContext
                                                                 .Users
                                                                 .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
 
+                        Guid objRouteID = Guid.NewGuid();
+
+                        List<SpotsRoutesModel> listSpotsRoutesModel = new List<SpotsRoutesModel>();
+
+                        int i = 0;
+                        foreach (SpotModel objSpotModel in listSpotModel)
+                        {
+                            listSpotsRoutesModel.Add(new SpotsRoutesModel() { Ordinal = i, RouteID = objRouteID, SpotID = objSpotModel.SpotID });
+                            i++;
+                        }
+
                         RouteModel objRouteModel = new RouteModel()
                         {
-                            RouteID = Guid.NewGuid(),
+                            RouteID = objRouteID,
                             CreatedByUserID = objApplicationUser.Id,
                             Description = objCreateRoutePostData.Description,
                             Name = objCreateRoutePostData.Name,
                             IsSystemRoute = false,
-                            Spots = listSpotModel
+                            Spots = listSpotsRoutesModel
                         };
 
                         objApplicationDbContext.Routes.Add(objRouteModel);
@@ -198,47 +220,53 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
 
-                using (DbContextTransaction objDbContextTransaction = objApplicationDbContext.Database.BeginTransaction())
+                RouteModel objRouteModel = objApplicationDbContext
+                                            .Routes   
+                                            .Include(x => x.Spots)
+                                            .FirstOrDefault(x => x.RouteID.ToString().Equals(objEditRoutePostData.RouteID));
+
+                if (objRouteModel == null)
                 {
-                    try
-                    {
-                        RouteModel objRouteModel = objApplicationDbContext
-                                                    .Routes
-                                                    .FirstOrDefault(x => x.RouteID.ToString().Equals(objEditRoutePostData.RouteID));
-
-                        if (objRouteModel == null)
-                        {
-                            return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_ID);
-                        }
-
-                        List<SpotModel> listSpotModel = objApplicationDbContext
-                                                            .Spots
-                                                            .Where(x => objEditRoutePostData.SpotIDs.Contains(x.SpotID.ToString()))
-                                                            .ToList();
-
-                        if (listSpotModel.Count != objEditRoutePostData.SpotIDs.Length)
-                        {
-                            return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
-                        }
-
-                        ApplicationUser objApplicationUser = objApplicationDbContext
-                                                                .Users
-                                                                .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));                        
-
-                        objRouteModel.Name = objEditRoutePostData.Name;
-                        objRouteModel.Description = objEditRoutePostData.Description;
-                        objRouteModel.IsSystemRoute = false;
-                        objRouteModel.Spots = listSpotModel;
-                        
-                        objApplicationDbContext.SaveChanges();
-
-                        objDbContextTransaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        objDbContextTransaction.Rollback();
-                    }
+                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_ID);
                 }
+
+                List<SpotModel> listSpotModel = objApplicationDbContext
+                                                    .Spots
+                                                    .Where(x => objEditRoutePostData.SpotIDs.Contains(x.SpotID.ToString()))
+                                                    .ToList();
+
+                if (listSpotModel.Count != objEditRoutePostData.SpotIDs.Length)
+                {
+                    return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INCORRECT_ROUTE_SPOTS);
+                }
+
+                // sort to keep correct order
+                listSpotModel = listSpotModel
+                                    .OrderBy(x => objEditRoutePostData.SpotIDs.ToList().IndexOf(x.SpotID.ToString()))
+                                    .ToList();
+
+                ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
+
+                objRouteModel.Name = objEditRoutePostData.Name;
+                objRouteModel.Description = objEditRoutePostData.Description;
+                objRouteModel.IsSystemRoute = false;
+
+                List<SpotsRoutesModel> listSpotsRoutesModel = new List<SpotsRoutesModel>();
+
+                int i = 0;
+                foreach (SpotModel objSpotModel in listSpotModel)
+                {
+                    listSpotsRoutesModel.Add(new SpotsRoutesModel() { Ordinal = i, RouteID = objRouteModel.RouteID, SpotID = objSpotModel.SpotID });
+                    i++;
+                }
+
+                objRouteModel.Spots = listSpotsRoutesModel;
+
+                objApplicationDbContext.SaveChanges();
+
+                return new WebAPIResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK);
             }
             catch (Exception ex) { }
             return new WebAPIResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR);

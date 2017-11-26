@@ -24,7 +24,6 @@ namespace EGuidebook.Models
 
         public bool IsSystemRoute { get; set; }
         
-        [ForeignKey("SpotID")]
-        public List<SpotModel> Spots { get; set; }
+        public List<SpotsRoutesModel> Spots { get; set; }
     }
 }

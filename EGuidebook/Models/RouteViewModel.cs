@@ -44,7 +44,7 @@ namespace EGuidebook.Models
             }
             else
             {
-                this.SpotsIDsListFormatted = string.Join(",", objRouteModel.Spots.Select(x => x.SpotID.ToString()));
+                this.SpotsIDsListFormatted = string.Join(",", objRouteModel.Spots.OrderBy(x => x.Ordinal).Select(x => x.SpotID.ToString()));
             }
         }
     }

@@ -26,6 +26,7 @@ namespace EGuidebook.Models
         public virtual DbSet<SpotGradeModel> Grades { get; set; }
         public virtual DbSet<SpotCategoryModel> SpotCategories { get; set; }
         public virtual DbSet<SystemSettingsModel> SystemSettings { get; set; }
+        public virtual DbSet<SpotsRoutesModel> SpotsRoutes { get; set; }
 
         public ApplicationDbContext()
             : base("defConnString", throwIfV1Schema: false)
@@ -42,17 +43,6 @@ namespace EGuidebook.Models
             objDbModelBuilder.Entity<IdentityUserLogin>().HasKey<string>(x => x.UserId);
             objDbModelBuilder.Entity<IdentityRole>().HasKey<string>(x => x.Id);
             objDbModelBuilder.Entity<IdentityUserRole>().HasKey(x => new { x.RoleId, x.UserId });
-
-            objDbModelBuilder.Entity<RouteModel>()
-            .HasMany(x => x.Spots)
-            .WithMany(x => x.Routes)
-            .Map(x =>
-            {
-                x.MapLeftKey("RouteID");
-                x.MapRightKey("SpotID");
-                x.ToTable("Spots_Routes");
-            });
-
             base.OnModelCreating(objDbModelBuilder);
         }
     }
