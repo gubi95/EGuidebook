@@ -95,7 +95,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 //}
 
                 List<SpotModel> listSpotModel = listSpot
-                                                .Include("Grades.User")                                                
+                                                .Include("Grades.User")
                                                 .ToList();
 
                 ApplicationUser objApplicationUser = objApplicationDbContext
@@ -108,6 +108,46 @@ namespace EGuidebook.Areas.WebAPI.Controllers
             }
             catch(Exception ex) { }
             return new GetByResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, new List<SpotWebAPIModel>());
+        }
+
+        public class GetBySpotIDResponse : WebAPIResponse
+        {
+            public SpotWebAPIModel Spot { get; private set; }
+
+            public GetBySpotIDResponse(bool bSuccess, EnumWebAPIResponseCode Code, SpotWebAPIModel objSpotWebAPIModel) : base(bSuccess, Code)
+            {
+                this.Spot = objSpotWebAPIModel;
+            }
+        }
+
+        [HttpGet]
+        [WebAPIBasicAuth]
+        public GetBySpotIDResponse GetBySpotID(string SpotID)
+        {
+            try
+            {
+                ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
+
+                SpotModel objSpotModel = objApplicationDbContext
+                                            .Spots
+                                            .Include("Grades.User")
+                                            .FirstOrDefault(x => x.SpotID.ToString().Equals(SpotID) && x.IsApproved);
+
+                if(objSpotModel == null)
+                {
+                    return new GetBySpotIDResponse(false, WebAPIResponse.EnumWebAPIResponseCode.SPOT_DOESNT_EXIST, null);
+                }
+                else
+                {
+                    ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
+
+                    return new GetBySpotIDResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, new SpotWebAPIModel(objSpotModel, objSpotModel.Grades.FirstOrDefault(y => y.User.Id.Equals(objApplicationUser.Id))));
+                }
+            }
+            catch (Exception ex) { }
+            return new GetBySpotIDResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, null);
         }
 
         public class CreateSpotModelPostData
