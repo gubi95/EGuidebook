@@ -21,10 +21,12 @@ namespace EGuidebook.Areas.WebAPI.Controllers
         public class LoginResponse : WebAPIResponse
         {
             public List<SpotCategoryModel> SpotCategories { get; private set; }
+            public int RoutesCount { get; private set; }
 
-            public LoginResponse(bool bSuccess, EnumWebAPIResponseCode eCode, List<SpotCategoryModel> listSpotCategoryModel) : base(bSuccess, eCode)
+            public LoginResponse(bool bSuccess, EnumWebAPIResponseCode eCode, List<SpotCategoryModel> listSpotCategoryModel, int nRoutesCount = -1) : base(bSuccess, eCode)
             {
                 this.SpotCategories = listSpotCategoryModel;
+                this.RoutesCount = nRoutesCount;
             }
         }
 
@@ -40,7 +42,15 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                                                     .SpotCategories
                                                                     .ToList();
 
-                return new LoginResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpotCategoryModel);
+                ApplicationUser objApplicationUser = objApplicationDbContext
+                                                        .Users
+                                                        .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
+
+                int nRoutesCount = objApplicationDbContext
+                                    .Routes
+                                    .Count(x => x.IsSystemRoute || ("" + x.CreatedByUserID).ToLower().Equals(objApplicationUser.Id.ToLower()));
+
+                return new LoginResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpotCategoryModel, nRoutesCount);
             }
             catch (Exception ex) { }
             return new LoginResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, null);
@@ -60,16 +70,6 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                 strPassword.Any(x => Char.IsLetterOrDigit(x)) &&            // at least 1 alphanumeric
                 strPassword.Any(x => !Char.IsLetterOrDigit(x)) &&           // at least 1 nonalphanumeric
                 strPassword.Any(x => Char.IsUpper(x));                      // at least 1 uppercase
-        }
-
-        public class RegiserResponse : WebAPIResponse
-        {
-            public List<SpotCategoryModel> SpotCategories { get; private set; }
-
-            public RegiserResponse(bool bSuccess, EnumWebAPIResponseCode eCode, List<SpotCategoryModel> listSpotCategoryModel) : base(bSuccess, eCode)
-            {
-                this.SpotCategories = listSpotCategoryModel;
-            }
         }
 
         [HttpPost]        
@@ -135,7 +135,11 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                                                     .SpotCategories
                                                                     .ToList();
 
-                            return new LoginResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpotCategoryModel);
+                            int nRoutesCount = objApplicationDbContext
+                                                .Routes
+                                                .Count(x => x.IsSystemRoute);
+
+                            return new LoginResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, listSpotCategoryModel, nRoutesCount);
                         }
                     }
                 }

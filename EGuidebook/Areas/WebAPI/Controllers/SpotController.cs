@@ -70,20 +70,25 @@ namespace EGuidebook.Areas.WebAPI.Controllers
 
         [HttpGet]
         [WebAPIBasicAuth]
-        public GetByResponse GetBy(string CategoryID, string CoorX, string CoorY)
+        public GetByResponse GetBy(string CategoryID, string SpotName, string CoorX, string CoorY)
         {
             try
             {
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
 
                 var listSpot = objApplicationDbContext
-                                .Spots           
+                                .Spots
                                 .Where(x => x.IsApproved)
                                 .AsQueryable();
 
                 if (!string.IsNullOrEmpty(CategoryID))
                 {
                     listSpot = listSpot.Where(x => x.SpotCategoryID.ToString().Equals("" + CategoryID));
+                }
+
+                if(!string.IsNullOrEmpty(SpotName))
+                {
+                    listSpot = listSpot.Where(x => ("" + x.Name).ToLower().Trim().IndexOf(("" + SpotName).Trim().ToLower()) != -1);
                 }
 
                 //if(!string.IsNullOrEmpty(CoorX) && !string.IsNullOrEmpty(CoorY))
@@ -102,11 +107,11 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                                         .Users
                                                         .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
 
-                return new GetByResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, 
+                return new GetByResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK,
                     listSpotModel.Select(
                         x => new SpotWebAPIModel(x, x.Grades.FirstOrDefault(y => y.User.Id.Equals(objApplicationUser.Id)))).ToList());
             }
-            catch(Exception ex) { }
+            catch (Exception ex) { }
             return new GetByResponse(false, WebAPIResponse.EnumWebAPIResponseCode.INTERNAL_SERVER_ERROR, new List<SpotWebAPIModel>());
         }
 
@@ -133,7 +138,7 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                             .Include("Grades.User")
                                             .FirstOrDefault(x => x.SpotID.ToString().Equals(SpotID) && x.IsApproved);
 
-                if(objSpotModel == null)
+                if (objSpotModel == null)
                 {
                     return new GetBySpotIDResponse(false, WebAPIResponse.EnumWebAPIResponseCode.SPOT_DOESNT_EXIST, null);
                 }
