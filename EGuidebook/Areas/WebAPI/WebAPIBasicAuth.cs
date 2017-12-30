@@ -18,13 +18,16 @@ namespace EGuidebook.Areas.WebAPI
         {
             try
             {
+                // get header
                 string strAuthroizationHeader = actionContext.Request.Headers.Authorization.Parameter.Replace("Basic ", "");
-                byte[] arrByte = Convert.FromBase64String(strAuthroizationHeader);
+                // decode header
+                byte[] arrByte = Convert.FromBase64String(strAuthroizationHeader);                
                 string strCredentialsDecoded = System.Text.Encoding.UTF8.GetString(arrByte);
-
+                // get username and password
                 string strUsername = strCredentialsDecoded.Split(':')[0];
                 string strPassword = strCredentialsDecoded.Split(':')[1];
 
+                // get user from DB
                 var userManager = HttpContext.Current.GetOwinContext().GetUserManager<ApplicationUserManager>();
 
                 ApplicationDbContext objApplicationDbContext = new ApplicationDbContext();
@@ -32,8 +35,9 @@ namespace EGuidebook.Areas.WebAPI
                 ApplicationUser objApplicationUser = objApplicationDbContext
                                                         .Users
                                                         .FirstOrDefault(x => x.UserName.Equals(strUsername));                
-
-                if (objApplicationUser == null || userManager.PasswordHasher.VerifyHashedPassword(objApplicationUser.PasswordHash, strPassword) != Microsoft.AspNet.Identity.PasswordVerificationResult.Success)
+                // check if password from request matches password in DB
+                if (objApplicationUser == null || 
+                    userManager.PasswordHasher.VerifyHashedPassword(objApplicationUser.PasswordHash, strPassword) != Microsoft.AspNet.Identity.PasswordVerificationResult.Success)
                 {
                     HandleUnauthorizedRequest(actionContext);
                 }

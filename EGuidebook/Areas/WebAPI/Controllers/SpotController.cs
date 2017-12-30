@@ -148,7 +148,8 @@ namespace EGuidebook.Areas.WebAPI.Controllers
                                                         .Users
                                                         .FirstOrDefault(x => x.UserName.Equals(HttpContext.Current.User.Identity.Name));
 
-                    return new GetBySpotIDResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, new SpotWebAPIModel(objSpotModel, objSpotModel.Grades.FirstOrDefault(y => y.User.Id.Equals(objApplicationUser.Id))));
+                    return new GetBySpotIDResponse(true, WebAPIResponse.EnumWebAPIResponseCode.OK, 
+                        new SpotWebAPIModel(objSpotModel, objSpotModel.Grades.FirstOrDefault(y => y.User.Id.Equals(objApplicationUser.Id))));
                 }
             }
             catch (Exception ex) { }
